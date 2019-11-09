@@ -1,4 +1,5 @@
-﻿  main.cpp
+﻿  backup.cpp
+  main.cpp
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(237): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(238): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(248): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
@@ -8,4 +9,6 @@ c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loade
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(255): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(256): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(355): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+  LINK : C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe not found or not built by the last incremental link; performing full link
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe
