@@ -21,8 +21,8 @@ const unsigned int windowWidth = 1600; // default value 1600 width
 const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///GPU buffer__________________________________________________
-unsigned int VBO, VAO, EBO;
-
+unsigned int mainVBO, objectVAO, mainEBO;
+unsigned int lightVAO;
 ///Triangles that make a cube__________________________________________________
 //vertices are the points we will use with their colour and texture coordinates
 float cube[] = {
@@ -92,6 +92,9 @@ glm::vec3 cubePositions[10] = {
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+///Light origin position
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 
 ///Textures______________________________________________________
 unsigned int textureWall;
@@ -140,8 +143,6 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 float fov = 45.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
 
-///lighting variables
-unsigned int lightVAO;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 ///initialize the shaders and what they will be processing from the verticies and indicies
@@ -161,16 +162,15 @@ void shadersInit() {
 ///initialize the triangle required functions, CREATE THE BUFFERS NEEDED FOR RENDERING triangles (VERTICIES AND INDICES)
 void triangleInit() {
 	// generate the vertex array object
-	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &objectVAO);
 	//generate the buffers
-	glGenBuffers(1, &VBO);
-	// generate the EBO for sharing points
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &mainVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mainVBO);
 	//bind the vertex array
-	glBindVertexArray(VAO);
+	glBindVertexArray(objectVAO);
 	//Bind the buffers
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glGenBuffers(1, &mainEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mainEBO);
 	//call the buffers and assign the triangles points to the buff-
 	//-er, what we are binding, size in data we want to allocate, the data to send to buff-
 	//-er how we want the GPU to manage (how often the data will change))
@@ -220,12 +220,12 @@ void textureInit() {
 void lightInit() {
 	//generate a seperate VAO for lighting elements
 	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO); // bind this new VAO
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindVertexArray(lightVAO); // bind this new VAO to the VBO
+	glBindBuffer(GL_ARRAY_BUFFER, mainVBO);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -337,17 +337,27 @@ int main() {
 
 	glewInit(); // initialise glew componenets
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
-	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
+	Shader objectShaders("mainVertex.vs", "mainFragment.fs");
+	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
+	
 	//further Inits
 	triangleInit();
 	shadersInit();
 	textureInit();
+	lightInit();
 
+	//enable the depth testing to render what is in front coordinante wise so what is behind in the 
+	//model is not rendered.
 	glEnable(GL_DEPTH_TEST);
 
-	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
-	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
-	basicShaders.setInt("texture2", 1); // or with shader class
+	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
+	glUniform1i(glGetUniformLocation(objectShaders.ID, "texture1"), 0); // set it manually
+	objectShaders.setInt("texture2", 1); // or with shader class
+
+
+	lightShaders.run();//actuvate first again to allow the uniform vec3s to be able to set
+	lightShaders.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	lightShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -368,7 +378,7 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, textureFace);
 
 		//draw the triangle using the shaders we have initialised
-		basicShaders.run();
+		objectShaders.run();
 
 		glm::mat4 translation = glm::mat4(1.0f); // must initialize first or it would be null
 		translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
@@ -383,14 +393,14 @@ int main() {
 		//viewMatrix = glm::translate(viewMatrix, cameraPos);
 
 		//tranformations
-		transformLoc = glGetUniformLocation(basicShaders.ID, "transform");
+		transformLoc = glGetUniformLocation(objectShaders.ID, "transform");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(translation));
-		viewLoc = glGetUniformLocation(basicShaders.ID, "view");
+		viewLoc = glGetUniformLocation(objectShaders.ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		projectionLoc = glGetUniformLocation(basicShaders.ID, "projection");
+		projectionLoc = glGetUniformLocation(objectShaders.ID, "projection");
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-		glBindVertexArray(VAO);
+		glBindVertexArray(objectVAO);
 
 		//repeate for 10 cubes
 		for (int i = 0; i < 10; i++) {
@@ -398,11 +408,19 @@ int main() {
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(20.0f), glm::vec3(1.0, 0.0, 0.0));
 			modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
-			modelLoc = glGetUniformLocation(basicShaders.ID, "model");
+			modelLoc = glGetUniformLocation(objectShaders.ID, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
 			glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 		}
+
+		glm::mat4 lightModelMatrix = glm::mat4(1.0f);
+		lightModelMatrix = glm::mat4(1.0f);
+		lightModelMatrix = glm::translate(lightModelMatrix, lightPos);
+		lightModelMatrix = glm::scale(lightModelMatrix, glm::vec3(0.2f));
+
+		glBindVertexArray(lightVAO);
+		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
@@ -410,9 +428,10 @@ int main() {
 
 
 	//de-allocate all resources once they've outlived their purpose:
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(1, &objectVAO);
+	glDeleteVertexArrays(1, &lightVAO);
+	glDeleteBuffers(1, &mainVBO);
+	glDeleteBuffers(1, &mainEBO);
 
 	//clean up and close down correctly
 	glfwDestroyWindow(window);
