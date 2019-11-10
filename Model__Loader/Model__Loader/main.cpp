@@ -20,7 +20,7 @@ using namespace std;
 const unsigned int windowWidth = 1600; // default value 1600 width
 const unsigned int windowHeight = 1200; // default value 1200 width
 
-///GPU buffer__________________________________________________
+///buffers__________________________________________________
 unsigned int VBO, VAO, EBO;
 
 ///Triangles that make a cube__________________________________________________
@@ -310,6 +310,33 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+///Load OBJ
+void loadOBJ() {
+	const char * objPath = "Creeper-obj\Creeper.obj";
+	string data = "no Data";
+	ifstream objFile;
+
+	try {
+		cout << "loading OBJ file..." << endl;
+		objFile.open(objPath);
+		stringstream objStream;
+
+		objStream << objFile.rdbuf();
+		data = objStream.str();
+		cout << data << endl;
+		objFile.close();
+
+
+	} catch (const std::exception&) {
+		cout << "failure reading from .obj file" << endl;
+	}
+		
+		
+	
+}
+
+///_________________________________________________________________________________________________End of Function
+
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
@@ -321,6 +348,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 	//create the window and check to see if the window opened correctly, if not terminate glfw and return error data
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
@@ -338,6 +366,8 @@ int main() {
 	glewInit(); // initialise glew componenets
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
+	
+	loadOBJ();
 	//further Inits
 	triangleInit();
 	shadersInit();
