@@ -7,5 +7,5 @@ c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loade
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(257): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(258): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(259): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(368): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(373): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe

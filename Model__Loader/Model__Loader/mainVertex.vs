@@ -6,6 +6,7 @@ layout (location = 2) in vec2 aTexCoord;
 
 out vec3 inColor;
 out vec2 inTexture;
+out vec3 inLighting;
 
 uniform mat4 transform;
 uniform mat4 projection;

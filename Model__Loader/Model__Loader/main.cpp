@@ -356,11 +356,16 @@ int main() {
 	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	glUniform1i(glGetUniformLocation(objectShaders.ID, "texture1"), 0); // set it manually
 	objectShaders.setInt("texture2", 1); // or with shader class
-
+	objectShaders.setVec3("lightingSourceColor", 1.0f, 1.0f, 1.0f);
+	objectShaders.setVec3("ambientStrength", 0.3f, 0.3f, 0.3f);
 
 	lightShaders.run();//actuvate first again to allow the uniform vec3s to be able to set
 	lightShaders.setVec3("lightBrightness", 1.0f, 1.0f, 1.0f);
 	lightShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
+	
+
+	
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -371,7 +376,7 @@ int main() {
 
 		processInput(window);// the key checks above for the escape key to close the window (own version)
 
-		glClearColor(0.15f, 0.1f, 0.15f, 0.5f); //set background render colour
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
 		//activate and bind the textures we are using
