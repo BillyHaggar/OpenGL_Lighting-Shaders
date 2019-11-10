@@ -223,8 +223,11 @@ void lightInit() {
 	glBindVertexArray(lightVAO); // bind this new VAO to the VBO
 	glBindBuffer(GL_ARRAY_BUFFER, mainVBO);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mainEBO);
+
+	shadersInit();
 
 }
 ///_________________________________________________________________________________________________End of function
@@ -356,7 +359,7 @@ int main() {
 
 
 	lightShaders.run();//actuvate first again to allow the uniform vec3s to be able to set
-	lightShaders.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	lightShaders.setVec3("lightBrightness", 1.0f, 1.0f, 1.0f);
 	lightShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
@@ -414,11 +417,15 @@ int main() {
 			glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 		}
 
-		glm::mat4 lightModelMatrix = glm::mat4(1.0f);
-		lightModelMatrix = glm::mat4(1.0f);
-		lightModelMatrix = glm::translate(lightModelMatrix, lightPos);
-		lightModelMatrix = glm::scale(lightModelMatrix, glm::vec3(0.2f));
 
+		lightShaders.run();
+		lightShaders.setMat4("projection", projectionMatrix);
+		lightShaders.setMat4("view", viewMatrix);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+		lightShaders.setMat4("model", model);
 		glBindVertexArray(lightVAO);
 		glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
