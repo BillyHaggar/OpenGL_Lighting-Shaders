@@ -13,6 +13,7 @@
 ///c++ libraries
 #include <iostream>
 
+
 using namespace std;
 /*--------------------- SETTINGS AND GLOBAL VARIABLES ---------------------------------------------------------------------*/
 ///Settings____________________________________________________
@@ -310,29 +311,30 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+glm::vec3 vertices[];
+glm::vec2 textureCoords[];
+glm::vec3 normals[];
+
 ///Load OBJ
-void loadOBJ() {
-	const char * objPath = "Creeper-obj\Creeper.obj";
-	string data = "no Data";
-	ifstream objFile;
+bool loadOBJ() {
+	glm::vec3 tempVertice;
+	glm::vec2 tempTexCoord;
+	glm::vec3 tempNormal;
 
-	try {
-		cout << "loading OBJ file..." << endl;
-		objFile.open(objPath);
-		stringstream objStream;
+	const char* filename = ".\\Creeper-obj\\Creeper.obj";
+	cout << "Loading creeper.obj" << endl;
+	string line;
+	ifstream fileRead(filename);
 
-		objStream << objFile.rdbuf();
-		data = objStream.str();
-		cout << data << endl;
-		objFile.close();
-
-
-	} catch (const std::exception&) {
-		cout << "failure reading from .obj file" << endl;
+	//if the map file is open keep reading and oushing each line to the vector
+	if (fileRead.is_open()) {
+		while (getline(fileRead, line)) {
+			cout << line + "\n";
+		}
+		fileRead.close();
 	}
-		
-		
-	
+
+	return true;
 }
 
 ///_________________________________________________________________________________________________End of Function
