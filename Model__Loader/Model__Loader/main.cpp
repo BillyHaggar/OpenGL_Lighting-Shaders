@@ -12,6 +12,7 @@
 #include "Shader.h"
 ///c++ libraries
 #include <iostream>
+#include <vector>
 
 
 using namespace std;
@@ -26,7 +27,7 @@ unsigned int VBO, VAO, EBO;
 
 ///Triangles that make a cube__________________________________________________
 //vertices are the points we will use with their colour and texture coordinates
-float cube[] = {
+float object[] = {
 	//points			  Colours			   Textures
 	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 0 near top right
 	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 1 near bottom right
@@ -80,7 +81,7 @@ unsigned int indices[] = {  // note that we start from 0!
 	21, 20, 23,
 };
 ///cube origin posistions
-glm::vec3 cubePositions[10] = {
+glm::vec3 objectPositions[10] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
   glm::vec3(2.0f,  5.0f, -15.0f),
   glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -176,7 +177,7 @@ void triangleInit() {
 	//-er, what we are binding, size in data we want to allocate, the data to send to buff-
 	//-er how we want the GPU to manage (how often the data will change))
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(object), object, GL_STATIC_DRAW);
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -311,38 +312,114 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
-glm::vec3 vertices[];
-glm::vec2 textureCoords[];
-glm::vec3 normals[];
+
+std::vector < glm::vec3 > vertices;
+std::vector < glm::vec2 > textureCoords;
+std::vector < glm::vec3 > normals;
+std::vector < int > vectorIndex, textureIndex, normalIndex;
+
+std::vector<int> faceSplitter(string word) {
+	stringstream sWord(word);
+	std::vector < int > values;
+	string token;
+
+	while (getline(sWord, token, '/')) {
+		values.push_back(stoi(token));
+	}
+
+	vectorIndex.push_back(values.at(0));
+	textureIndex.push_back(values.at(1));
+	normalIndex.push_back(values.at(2));
+	return values;
+}
 
 ///Load OBJ
 bool loadOBJ() {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
 	glm::vec3 tempNormal;
+	int numOfWords = 0;
 
 	const char* filename = ".\\Creeper-obj\\Creeper.obj";
 	cout << "Loading creeper.obj" << endl;
+	 
 	string line;
 	ifstream fileRead(filename);
+	string header;
 
-	//if the map file is open keep reading and oushing each line to the vector
 	if (fileRead.is_open()) {
 		while (getline(fileRead, line)) {
-			cout << line + "\n";
+			//cout << line << endl;
+			stringstream linestream(line);
+			string lineHead;
+			linestream >> lineHead;
+
+			if (lineHead == "v") {
+				linestream >> tempVertice.x >> tempVertice.y >> tempVertice.z;
+				vertices.push_back(tempVertice);
+				//cout << tempVertice.x << tempVertice.y << tempVertice.z << endl;
+			
+			} else if (lineHead == "vt") {
+				linestream >> tempTexCoord.x >> tempTexCoord.y;
+				textureCoords.push_back(tempTexCoord);
+				//cout << tempTexCoord.x << tempTexCoord.y << endl;
+			
+			} else if (lineHead == "vn") {
+				linestream >> tempNormal.x >> tempNormal.y >> tempNormal.z;
+				normals.push_back(tempNormal);
+				//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
+			
+			} else if (lineHead == "f") {
+				
+				char c;
+				for (int i = 0; i < line.length(); i++) {
+					c = line.at(i);
+					if (isspace(c)) {
+						numOfWords++;
+					}
+				}
+				
+				if (numOfWords == 4) {
+					string w1, w2, w3, w4;
+					linestream >> w1 >> w2 >> w3 >> w4;
+
+					faceSplitter(w1);
+					faceSplitter(w2);
+					faceSplitter(w3);
+					faceSplitter(w4);
+				}
+
+				if (numOfWords == 3) {
+					string w1, w2, w3;
+					linestream >> w1 >> w2 >> w3;
+
+					faceSplitter(w1);
+					faceSplitter(w2);
+					faceSplitter(w3);
+				}
+			}
 		}
 		fileRead.close();
-	}
 
+		/*for (int i = 0; i < vectorIndex.size(); i++) {
+
+			cout << vectorIndex.at(i) << "/" << textureIndex.at(i) << "/" << normalIndex.at(i) << endl;
+
+		}*/
+
+		//Load into object and indices
+	}
 	return true;
 }
-
 ///_________________________________________________________________________________________________End of Function
+
+
 
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
+	loadOBJ();
 
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
@@ -369,7 +446,7 @@ int main() {
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
 	
-	loadOBJ();
+
 	//further Inits
 	triangleInit();
 	shadersInit();
@@ -429,7 +506,7 @@ int main() {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(20.0f), glm::vec3(1.0, 0.0, 0.0));
-			modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
+			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 			modelLoc = glGetUniformLocation(basicShaders.ID, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 

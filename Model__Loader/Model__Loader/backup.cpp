@@ -12,21 +12,17 @@
 //#include "Shader.h"
 /////c++ libraries
 //#include <iostream>
+//#include <vector>
+//
 //
 //using namespace std;
-//
 ///*--------------------- SETTINGS AND GLOBAL VARIABLES ---------------------------------------------------------------------*/
 /////Settings____________________________________________________
 ////set the window height and width here
 //const unsigned int windowWidth = 1600; // default value 1600 width
 //const unsigned int windowHeight = 1200; // default value 1200 width
 //
-//
-//float lastX = windowWidth / 2;
-//float lastY = windowHeight / 2;
-//
-//
-/////GPU buffer__________________________________________________
+/////buffers__________________________________________________
 //unsigned int VBO, VAO, EBO;
 //
 /////Triangles that make a cube__________________________________________________
@@ -98,6 +94,7 @@
 //  glm::vec3(-1.3f,  1.0f, -1.5f)
 //};
 //
+//
 /////Textures______________________________________________________
 //unsigned int textureWall;
 //unsigned int textureFace;
@@ -118,22 +115,35 @@
 //unsigned int modelLoc;
 //
 /////Camera variables to be used by the view matrix
+////initial stating location of the camera
 //glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 //glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 //glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 //
+////initial variables of the x,y,z coodinates of the camera pointing direction
+////remember that this is acheived by actually mving everything to give the illusion of camera movement
 //glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 //glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
 //glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 //glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 //
+////declare the locations for the mouse location
+////Initialise with the original location of the centre of the window
+//float lastX = windowWidth / 2;
+//float lastY = windowHeight / 2;
+//
+//
 //float deltaTime = 0.0f;	// Time between current frame and last frame
 //float lastFrame = 0.0f; // Time of last frame
 //
+////mouse variables, used to know where the camer is pointing, initail variables set the starting location
 //bool firstMouse = true;
 //float yaw = -90.0f;
 //float pitch = 0.0f;
-//float fov = 45.0f;
+//float fov = 45.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
+//
+/////lighting variables
+//unsigned int lightVAO;
 //
 ///*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 /////initialize the shaders and what they will be processing from the verticies and indicies
@@ -150,7 +160,7 @@
 //}
 /////_________________________________________________________________________________________________End of function
 //
-/////initialize the triangle required functions, CREATE THE BUFFERS NEEDED FOR RENDERING
+/////initialize the triangle required functions, CREATE THE BUFFERS NEEDED FOR RENDERING triangles (VERTICIES AND INDICES)
 //void triangleInit() {
 //	// generate the vertex array object
 //	glGenVertexArrays(1, &VAO);
@@ -207,30 +217,25 @@
 //}
 /////_________________________________________________________________________________________________End of function
 //
-///////basic transofrmations function
-//////deal with glm transformations
-////void transformationFunction() {
-////	translation = glm::rotate(translation, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
-////	translation = glm::scale(translation, glm::vec3(0.5, 0.5, 0.5));
-////
-////	vector = translation * vector;
-////	cout << "Matrix transformation coreect if 211 == " << vector.x << vector.y << vector.z << endl;
-////}
-///////_________________________________________________________________________________________________End of function
-////
-///////basic transofrmations function
-//////deal with glm transformations
-////void rotate() {
-////	translation = glm::rotate(translation, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-////	translation = glm::scale(translation, glm::vec3(0.5, 0.5, 0.5));
-////
-////}
-///////_________________________________________________________________________________________________End of function
+//
+/////create and initialize all things lighting
+//void lightInit() {
+//	//generate a seperate VAO for lighting elements
+//	glGenVertexArrays(1, &lightVAO);
+//	glBindVertexArray(lightVAO); // bind this new VAO
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//
+//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+//	glEnableVertexAttribArray(0);
+//}
+/////_________________________________________________________________________________________________End of function
 //
 /////viewport handler
 ////deal with window resizes and edit the render space
 //void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 //	glViewport(0, 0, width, height);
+//	//reset the mouse posisions when going full screen or window size change
 //	lastX = width / 2;
 //	lastY = height / 2;
 //}
@@ -239,11 +244,11 @@
 /////Mouse callback hander function
 //void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 //
+//	//stop mouse jumping around when first detecting mouse
 //	if (firstMouse)
 //	{
 //		lastX = xpos;
 //		lastY = ypos;
-//		cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 //		firstMouse = false;
 //	}
 //
@@ -259,6 +264,7 @@
 //	yaw += xOffset;
 //	pitch += yOffset;
 //
+//	//stop the mouse looping round the z axis, can only go as high as the sky and the floor
 //	if (pitch < -89.0f)
 //		pitch = -89.0;
 //	if (pitch > 89.0f)
@@ -299,13 +305,62 @@
 //		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 //	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 //		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 //}
 /////_________________________________________________________________________________________________End of function
+//
+//std::vector < glm::vec3 > vertices;
+//std::vector < glm::vec2 > textureCoords;
+//std::vector < glm::vec3 > normals;
+//
+/////Load OBJ
+//bool loadOBJ() {
+//	glm::vec3 tempVertice;
+//	glm::vec2 tempTexCoord;
+//	glm::vec3 tempNormal;
+//
+//	const char* filename = ".\\Creeper-obj\\Creeper.obj";
+//	cout << "Loading creeper.obj" << endl;
+//
+//	string line;
+//	ifstream fileRead(filename);
+//	string header;
+//
+//	if (fileRead.is_open()) {
+//		while (getline(fileRead, line)) {
+//			cout << line << endl;
+//			stringstream linestream(line);
+//			if (line.substr(0, 2) == "v ") {
+//				linestream >> header >> tempVertice.x >> tempVertice.y >> tempVertice.z;
+//				vertices.push_back(tempVertice);
+//			}
+//			else if (line.substr(0, 2) == "vt") {
+//				linestream >> header >> tempTexCoord.x >> tempTexCoord.y;
+//				textureCoords.push_back(tempTexCoord);
+//			}
+//			else if (line.substr(0, 2) == "vn") {
+//				linestream >> header >> tempNormal.x >> tempNormal.y >> tempNormal.z;
+//				normals.push_back(tempNormal);
+//			}
+//			else if (line.substr(0, 2) == "f ") {
+//				cout << "face" << endl;
+//			}
+//		}
+//		fileRead.close();
+//	}
+//
+//	return true;
+//}
+/////_________________________________________________________________________________________________End of Function
 //
 /////main program run
 //int main() {
 //	cout << "Program Running..." << endl;
 //	cout << "Press escape to close software..." << endl << endl;
+//
 //	//intialise the required GLFW things
 //	glewExperimental = GL_TRUE; //needed for some reason unknown
 //	glfwInit();
@@ -315,7 +370,7 @@
 //
 //
 //	//create the window and check to see if the window opened correctly, if not terminate glfw and return error data
-//	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "LearnOpenGL", NULL, NULL);
+//	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 //	if (window == NULL)
 //	{
 //		cout << "Failed to create GLFW window" << endl;
@@ -324,46 +379,38 @@
 //	}
 //	glfwMakeContextCurrent(window); //target window of open gl we created
 //	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
-//
 //	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 //	glfwSetCursorPosCallback(window, mouse_callback);
 //
 //	glewInit(); // initialise glew componenets
 //	//create the shaders needed using the shader header to create the vertex and the fragment shader
-//	Shader basicShaders("vertexShader.vs", "fragmentShader.fs");
+//	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
+//
+//	loadOBJ();
 //	//further Inits
 //	triangleInit();
-//	//initialise the shaders
 //	shadersInit();
-//	//now apply the textures
 //	textureInit();
 //
 //	glEnable(GL_DEPTH_TEST);
-//
-//	//draw in wireframe mode
-//	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//	//draw in regular mode
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//
 //
 //	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
 //	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
 //	basicShaders.setInt("texture2", 1); // or with shader class
 //
-//
-//
-//
 //	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 //	while (!glfwWindowShouldClose(window)) {
+//		//calulate time between frames
 //		float currentFrame = glfwGetTime();
 //		deltaTime = currentFrame - lastFrame;
 //		lastFrame = currentFrame;
 //
 //		processInput(window);// the key checks above for the escape key to close the window (own version)
-//		// rendering commands here
+//
 //		glClearColor(0.15f, 0.1f, 0.15f, 0.5f); //set background render colour
 //		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 //
+//		//activate and bind the textures we are using
 //		glActiveTexture(GL_TEXTURE0);
 //		glBindTexture(GL_TEXTURE_2D, textureWall);
 //		glActiveTexture(GL_TEXTURE1);
@@ -371,7 +418,6 @@
 //
 //		//draw the triangle using the shaders we have initialised
 //		basicShaders.run();
-//
 //
 //		glm::mat4 translation = glm::mat4(1.0f); // must initialize first or it would be null
 //		translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
@@ -384,7 +430,6 @@
 //		glm::mat4 viewMatrix = glm::mat4(1.0f);
 //		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 //		//viewMatrix = glm::translate(viewMatrix, cameraPos);
-//
 //
 //		//tranformations
 //		transformLoc = glGetUniformLocation(basicShaders.ID, "transform");
@@ -412,10 +457,12 @@
 //		glfwPollEvents(); // Deals with pollling events such as key events
 //	}
 //
+//
 //	//de-allocate all resources once they've outlived their purpose:
 //	glDeleteVertexArrays(1, &VAO);
 //	glDeleteBuffers(1, &VBO);
 //	glDeleteBuffers(1, &EBO);
+//
 //	//clean up and close down correctly
 //	glfwDestroyWindow(window);
 //	glfwTerminate();
