@@ -28,7 +28,7 @@ unsigned int VBO, VAO, EBO;
 ///Triangles that make a cube__________________________________________________
 //vertices are the points we will use with their colour and texture coordinates
 float object[] = {
-	//points			  Colours			   Textures
+	//points			  normals			   Textures
 	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 0 near top right
 	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 1 near bottom right
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 2 near bottom left
@@ -59,6 +59,7 @@ float object[] = {
 	 0.5f,  0.5f,  0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 22 top top right?
 	-0.5f,  0.5f,  0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  1.0f, // 23 top top left?
 };
+
 //indices are the links between these points that will link up to make the triangles
 unsigned int indices[] = {  // note that we start from 0!
 	//front face
@@ -151,7 +152,7 @@ void shadersInit() {
 	//vertex coordinates
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	//Colour
+	//Normal
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	//texture coord attribute
@@ -205,7 +206,7 @@ void textureInit() {
 	///second texture
 	stbi_set_flip_vertically_on_load(true);
 	//read the data from file
-	textureData = stbi_load("awesomeface.png", &textureWidth, &textureHeight, &nrChannels, 0);
+	textureData = stbi_load(".\\Creeper-obj\\Texture.png", &textureWidth, &textureHeight, &nrChannels, 0);
 	glGenTextures(1, &textureFace);
 	glBindTexture(GL_TEXTURE_2D, textureFace);
 	//create the texture image
@@ -312,11 +313,15 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+//temp loaded object data
+std::vector < glm::vec3 > vertices; //vector point for the object
+std::vector < glm::vec2 > textureCoords; // texture coordinates for the object
+std::vector < glm::vec3 > normals;	// normal coordinates for the object
+std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices element index ((element.at(index) - 1) == index to link to above)
+int numOfFaces = 0; //total number of faces for the object
+std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
 
-std::vector < glm::vec3 > vertices;
-std::vector < glm::vec2 > textureCoords;
-std::vector < glm::vec3 > normals;
-std::vector < int > vectorIndex, textureIndex, normalIndex;
+
 
 std::vector<int> faceSplitter(string word) {
 	stringstream sWord(word);
@@ -338,7 +343,6 @@ bool loadOBJ() {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
 	glm::vec3 tempNormal;
-	int numOfWords = 0;
 
 	const char* filename = ".\\Creeper-obj\\Creeper.obj";
 	cout << "Loading creeper.obj" << endl;
@@ -370,8 +374,8 @@ bool loadOBJ() {
 				//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
 			
 			} else if (lineHead == "f") {
-				
 				char c;
+				int numOfWords = 0;
 				for (int i = 0; i < line.length(); i++) {
 					c = line.at(i);
 					if (isspace(c)) {
@@ -387,6 +391,10 @@ bool loadOBJ() {
 					faceSplitter(w2);
 					faceSplitter(w3);
 					faceSplitter(w4);
+
+					faceQuad.push_back(true);
+
+					numOfFaces++;
 				}
 
 				if (numOfWords == 3) {
@@ -396,23 +404,74 @@ bool loadOBJ() {
 					faceSplitter(w1);
 					faceSplitter(w2);
 					faceSplitter(w3);
+
+					faceQuad.push_back(false);
+
+					numOfFaces++;
 				}
 			}
 		}
 		fileRead.close();
-
-		/*for (int i = 0; i < vectorIndex.size(); i++) {
-
-			cout << vectorIndex.at(i) << "/" << textureIndex.at(i) << "/" << normalIndex.at(i) << endl;
-
-		}*/
-
-		//Load into object and indices
 	}
 	return true;
 }
 ///_________________________________________________________________________________________________End of Function
 
+void objectBuilder() {
+	std::vector <float> object;
+	std::vector <float> indices;
+	
+
+	
+	int verticeReadIndex = 0;
+	for (int i = 0; i < numOfFaces; i++) {
+		if (faceQuad.at(i) == true) {
+			
+			for (int j = 0; j < 4; j++) {
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).x);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).y);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).z);
+				
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex)-1).x);
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex)-1).y);
+				object.push_back(vertices.at(normalIndex.at(verticeReadIndex)-1).z);
+
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex)-1).x);
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex)-1).y);
+
+				verticeReadIndex++;
+			}
+
+			indices.push_back(i * 4 + 0);
+			indices.push_back(i * 4 + 1);
+			indices.push_back(i * 4 + 2);
+			indices.push_back(i * 4 + 2);
+			indices.push_back(i * 4 + 3);
+			indices.push_back(i * 4 + 0);
+		}
+		else if (faceQuad.at(i) == false) {
+			for (int j = 0; j < 3; j++) {
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).y);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).z);
+
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
+				object.push_back(vertices.at(normalIndex.at(verticeReadIndex) - 1).z);
+
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
+
+				verticeReadIndex++;
+			}
+
+			indices.push_back(i * 4 + 0);
+			indices.push_back(i * 4 + 1);
+			indices.push_back(i * 4 + 2);
+		}
+	}
+
+}
 
 
 ///main program run
@@ -420,7 +479,7 @@ int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
 	loadOBJ();
-
+	objectBuilder();
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
 	glfwInit();

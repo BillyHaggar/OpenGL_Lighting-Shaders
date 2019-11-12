@@ -27,8 +27,8 @@
 //
 /////Triangles that make a cube__________________________________________________
 ////vertices are the points we will use with their colour and texture coordinates
-//float cube[] = {
-//	//points			  Colours			   Textures
+//float object[] = {
+//	//points			  normals			   Textures
 //	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 0 near top right
 //	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 1 near bottom right
 //	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 2 near bottom left
@@ -81,7 +81,7 @@
 //	21, 20, 23,
 //};
 /////cube origin posistions
-//glm::vec3 cubePositions[10] = {
+//glm::vec3 objectPositions[10] = {
 //  glm::vec3(0.0f,  0.0f,  0.0f),
 //  glm::vec3(2.0f,  5.0f, -15.0f),
 //  glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -151,7 +151,7 @@
 //	//vertex coordinates
 //	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 //	glEnableVertexAttribArray(0);
-//	//Colour
+//	//Normal
 //	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 //	glEnableVertexAttribArray(1);
 //	//texture coord attribute
@@ -177,7 +177,7 @@
 //	//-er, what we are binding, size in data we want to allocate, the data to send to buff-
 //	//-er how we want the GPU to manage (how often the data will change))
 //	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(object), object, GL_STATIC_DRAW);
 //}
 /////_________________________________________________________________________________________________End of function
 //
@@ -205,7 +205,7 @@
 //	///second texture
 //	stbi_set_flip_vertically_on_load(true);
 //	//read the data from file
-//	textureData = stbi_load("awesomeface.png", &textureWidth, &textureHeight, &nrChannels, 0);
+//	textureData = stbi_load(".\\Creeper-obj\\Texture.png", &textureWidth, &textureHeight, &nrChannels, 0);
 //	glGenTextures(1, &textureFace);
 //	glBindTexture(GL_TEXTURE_2D, textureFace);
 //	//create the texture image
@@ -312,9 +312,26 @@
 //}
 /////_________________________________________________________________________________________________End of function
 //
+//
 //std::vector < glm::vec3 > vertices;
 //std::vector < glm::vec2 > textureCoords;
 //std::vector < glm::vec3 > normals;
+//std::vector < int > vectorIndex, textureIndex, normalIndex;
+//
+//std::vector<int> faceSplitter(string word) {
+//	stringstream sWord(word);
+//	std::vector < int > values;
+//	string token;
+//
+//	while (getline(sWord, token, '/')) {
+//		values.push_back(stoi(token));
+//	}
+//
+//	vectorIndex.push_back(values.at(0));
+//	textureIndex.push_back(values.at(1));
+//	normalIndex.push_back(values.at(2));
+//	return values;
+//}
 //
 /////Load OBJ
 //bool loadOBJ() {
@@ -331,35 +348,82 @@
 //
 //	if (fileRead.is_open()) {
 //		while (getline(fileRead, line)) {
-//			cout << line << endl;
+//			//cout << line << endl;
 //			stringstream linestream(line);
-//			if (line.substr(0, 2) == "v ") {
-//				linestream >> header >> tempVertice.x >> tempVertice.y >> tempVertice.z;
+//			string lineHead;
+//			linestream >> lineHead;
+//
+//			if (lineHead == "v") {
+//				linestream >> tempVertice.x >> tempVertice.y >> tempVertice.z;
 //				vertices.push_back(tempVertice);
+//				//cout << tempVertice.x << tempVertice.y << tempVertice.z << endl;
+//
 //			}
-//			else if (line.substr(0, 2) == "vt") {
-//				linestream >> header >> tempTexCoord.x >> tempTexCoord.y;
+//			else if (lineHead == "vt") {
+//				linestream >> tempTexCoord.x >> tempTexCoord.y;
 //				textureCoords.push_back(tempTexCoord);
+//				//cout << tempTexCoord.x << tempTexCoord.y << endl;
+//
 //			}
-//			else if (line.substr(0, 2) == "vn") {
-//				linestream >> header >> tempNormal.x >> tempNormal.y >> tempNormal.z;
+//			else if (lineHead == "vn") {
+//				linestream >> tempNormal.x >> tempNormal.y >> tempNormal.z;
 //				normals.push_back(tempNormal);
+//				//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
+//
 //			}
-//			else if (line.substr(0, 2) == "f ") {
-//				cout << "face" << endl;
+//			else if (lineHead == "f") {
+//
+//				char c;
+//				int numOfWords = 0;
+//				for (int i = 0; i < line.length(); i++) {
+//					c = line.at(i);
+//					if (isspace(c)) {
+//						numOfWords++;
+//					}
+//				}
+//
+//				if (numOfWords == 4) {
+//					string w1, w2, w3, w4;
+//					linestream >> w1 >> w2 >> w3 >> w4;
+//
+//					faceSplitter(w1);
+//					faceSplitter(w2);
+//					faceSplitter(w3);
+//					faceSplitter(w4);
+//				}
+//
+//				if (numOfWords == 3) {
+//					string w1, w2, w3;
+//					linestream >> w1 >> w2 >> w3;
+//
+//					faceSplitter(w1);
+//					faceSplitter(w2);
+//					faceSplitter(w3);
+//				}
 //			}
 //		}
 //		fileRead.close();
-//	}
 //
+//		for (int i = 0; i < vectorIndex.size(); i++) {
+//
+//			cout << vectorIndex.at(i) << "/" << textureIndex.at(i) << "/" << normalIndex.at(i) << endl;
+//
+//		}
+//	}
 //	return true;
 //}
 /////_________________________________________________________________________________________________End of Function
+//
+//void objectBuilder() {
+//
+//}
+//
 //
 /////main program run
 //int main() {
 //	cout << "Program Running..." << endl;
 //	cout << "Press escape to close software..." << endl << endl;
+//	loadOBJ();
 //
 //	//intialise the required GLFW things
 //	glewExperimental = GL_TRUE; //needed for some reason unknown
@@ -386,7 +450,7 @@
 //	//create the shaders needed using the shader header to create the vertex and the fragment shader
 //	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
 //
-//	loadOBJ();
+//
 //	//further Inits
 //	triangleInit();
 //	shadersInit();
@@ -446,7 +510,7 @@
 //			//model matrix
 //			glm::mat4 modelMatrix = glm::mat4(1.0f);
 //			modelMatrix = glm::rotate(modelMatrix, glm::radians(20.0f), glm::vec3(1.0, 0.0, 0.0));
-//			modelMatrix = glm::translate(modelMatrix, cubePositions[i]);
+//			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 //			modelLoc = glGetUniformLocation(basicShaders.ID, "model");
 //			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 //
