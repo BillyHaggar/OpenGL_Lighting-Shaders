@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vector>
 
-
 using namespace std;
 /*--------------------- SETTINGS AND GLOBAL VARIABLES ---------------------------------------------------------------------*/
 ///Settings____________________________________________________
@@ -23,7 +22,7 @@ const unsigned int windowWidth = 1600; // default value 1600 width
 const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///buffers__________________________________________________
-unsigned int VBO, VAO, EBO;
+unsigned int VBO, VAO, EBO, lightVBO, lightEBO;
 
 ///object origin posistions
 glm::vec3 objectPositions[10] = {
@@ -38,6 +37,54 @@ glm::vec3 objectPositions[10] = {
   glm::vec3(1.5f,  0.2f, -1.5f),
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
+glm::vec3 lightPosition(3.0f, 2.0f, 2.0f);
+
+float lightCube[36*3] = {
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f, -0.5f,
+		 0.5f, -0.5f,  0.5f,
+		 0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f, -0.5f,
+		 0.5f,  0.5f,  0.5f,
+		 0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+};
+
+//temp loaded object data
+std::vector < glm::vec3 > vertices; //vector point for the object
+std::vector < glm::vec2 > textureCoords; // texture coordinates for the object
+std::vector < glm::vec3 > normals;	// normal coordinates for the object
+std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices element index ((element.at(index) - 1) == index to link to above)
+int numOfFaces = 0; //total number of faces for the object
+std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
 
 std::vector <float> object;
 std::vector <int> indices;
@@ -63,7 +110,7 @@ unsigned int modelLoc;
 
 ///Camera variables to be used by the view matrix
 //initial stating location of the camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.5f, 0.5f, 3.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
@@ -79,7 +126,6 @@ glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 float lastX = windowWidth / 2;
 float lastY = windowHeight / 2;
 
-
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
@@ -87,7 +133,7 @@ float lastFrame = 0.0f; // Time of last frame
 bool firstMouse = true;
 float yaw = -90.0f;
 float pitch = 0.0f;
-float fov = 45.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
+float fov = 60.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
 
 ///lighting variables
 unsigned int lightVAO;
@@ -137,19 +183,6 @@ void textureInit() {
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	///first texture
-	textureData = stbi_load("wall.jpg", &textureWidth, &textureHeight, &nrChannels, 0); //use stb_image to read the data from the texture file
-	//first argument is how many textures we want to bind, second is the reference to where we want to store them
-	glGenTextures(1, &textureWall);
-	//as before we now bind the textures we need
-	glBindTexture(GL_TEXTURE_2D, textureWall);
-	//now get the data and load it into the created texture space
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-	//generate a mipmap(different size images to use) from the texture
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(textureData); // clear up the data now we dont need it
-
-	///second texture
 	stbi_set_flip_vertically_on_load(true);
 	//read the data from file
 	textureData = stbi_load(".\\Creeper-obj\\Texture.png", &textureWidth, &textureHeight, &nrChannels, 0);
@@ -170,11 +203,15 @@ void lightInit() {
 	//generate a seperate VAO for lighting elements
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO); // bind this new VAO
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &lightVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -259,15 +296,6 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
-//temp loaded object data
-std::vector < glm::vec3 > vertices; //vector point for the object
-std::vector < glm::vec2 > textureCoords; // texture coordinates for the object
-std::vector < glm::vec3 > normals;	// normal coordinates for the object
-std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices element index ((element.at(index) - 1) == index to link to above)
-int numOfFaces = 0; //total number of faces for the object
-std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
-
-
 std::vector<int> faceSplitter(string word) {
 	stringstream sWord(word);
 	std::vector < int > values;
@@ -284,7 +312,7 @@ std::vector<int> faceSplitter(string word) {
 }
 
 ///Load OBJ
-const char* filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.obj";
+const char* filename = ".\\Creeper-obj\\Creeper.obj";
 bool loadOBJ() {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
@@ -365,7 +393,7 @@ bool loadOBJ() {
 }
 ///_________________________________________________________________________________________________End of Function
 
-
+///build the object
 void objectBuilder() {
 
 
@@ -418,6 +446,8 @@ void objectBuilder() {
 		}
 	}
 }
+///_________________________________________________________________________________________________End of Function
+
 
 
 ///main program run
@@ -427,14 +457,12 @@ int main() {
 	loadOBJ();
 	objectBuilder();
 
-
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 
 	//create the window and check to see if the window opened correctly, if not terminate glfw and return error data
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
@@ -452,12 +480,16 @@ int main() {
 	glewInit(); // initialise glew componenets
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
-
+	Shader lightShaders("lightVertex.vs", "mainFragment.fs");
 
 	//further Inits
 	triangleInit();
 	shadersInit();
 	textureInit();
+	lightInit();
+
+	lightShaders.run();
+	lightShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -474,7 +506,7 @@ int main() {
 
 		processInput(window);// the key checks above for the escape key to close the window (own version)
 
-		glClearColor(0.15f, 0.1f, 0.15f, 0.5f); //set background render colour
+		glClearColor(0.15f, 0.15f, 0.15f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
 		//activate and bind the textures we are using
@@ -488,11 +520,11 @@ int main() {
 
 		glm::mat4 translation = glm::mat4(1.0f); // must initialize first or it would be null
 		//translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
-		float scaleAmount = 0.5f;//sin(glfwGetTime());
+		float scaleAmount = 0.7f;//sin(glfwGetTime());
 		translation = glm::scale(translation, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
 		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
-		glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
+		glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
 
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -507,6 +539,7 @@ int main() {
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
 		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		//repeate for 10 cubes
 		for (int i = 0; i < 1; i++) {
@@ -519,6 +552,22 @@ int main() {
 
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}
+		
+		lightShaders.run();
+		lightShaders.setMat4("projection", projectionMatrix);
+		lightShaders.setMat4("view", viewMatrix);
+		
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		modelMatrix = glm::scale(translation, glm::vec3(0.4f, 0.4f, 0.4f));
+		modelMatrix = glm::translate(modelMatrix, lightPosition);
+		modelLoc = glGetUniformLocation(basicShaders.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+		glBindVertexArray(lightVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+
+		lightShaders.setMat4("model", modelMatrix);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
@@ -528,6 +577,8 @@ int main() {
 	//de-allocate all resources once they've outlived their purpose:
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &lightVAO);
+	glDeleteBuffers(1, &lightVBO);
 	glDeleteBuffers(1, &EBO);
 
 	//clean up and close down correctly
