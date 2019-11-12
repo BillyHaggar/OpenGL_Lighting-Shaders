@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.PNG" />
+    <Image Include="Image.png" />
     <Image Include="wall.jpg" />
   </ItemGroup>
   <ItemGroup>

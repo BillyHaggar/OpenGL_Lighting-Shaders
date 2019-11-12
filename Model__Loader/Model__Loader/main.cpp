@@ -25,63 +25,7 @@ const unsigned int windowHeight = 1200; // default value 1200 width
 ///buffers__________________________________________________
 unsigned int VBO, VAO, EBO;
 
-///Triangles that make a cube__________________________________________________
-//vertices are the points we will use with their colour and texture coordinates
-float object[] = {
-	//points			  normals			   Textures
-	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 0 near top right
-	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 1 near bottom right
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 2 near bottom left
-	-0.5f,  0.5f, -0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  1.0f, // 3 near top left 
-
-	 0.5f,  0.5f,  0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 4 far top right
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 5 far bottom right
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 6 far bottom left
-	-0.5f,  0.5f,  0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  1.0f, // 7 far top left 
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.3f,    1.0f,  0.0f, // 8 left bottom right
-	-0.5f,  0.5f, -0.5f,  0.3f, 0.3f, 0.0f,    1.0f,  1.0f, // 9 left top right 
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 10 left bottom left
-	-0.5f,  0.5f,  0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  1.0f, // 11 left top left 
-
-	 0.5f,  0.5f,  0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 12 right top right
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 13 right bottom right
-	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    0.0f,  1.0f, // 14 right top left
-	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    0.0f,  0.0f, // 15 right bottom left
-
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  1.0f, // 16 bottom top right?
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  1.0f, // 17 bottom top left?
-	 0.5f, -0.5f, -0.5f,  0.0f, 0.3f, 0.0f,    1.0f,  0.0f, // 18 bottom bottom right?
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.3f,    0.0f,  0.0f, // 19 bottom bottom left?
-
-	-0.5f,  0.5f, -0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  0.0f, // 20 top bottom left?
-	 0.5f,  0.5f, -0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  0.0f, // 21 top bottom right?
-	 0.5f,  0.5f,  0.5f,  0.3f, 0.0f, 0.0f,    1.0f,  1.0f, // 22 top top right?
-	-0.5f,  0.5f,  0.5f,  0.3f, 0.3f, 0.0f,    0.0f,  1.0f, // 23 top top left?
-};
-
-//indices are the links between these points that will link up to make the triangles
-unsigned int indices[] = {  // note that we start from 0!
-	//front face
-	0, 1, 3,   // first triangle
-	1, 2, 3,    // second triangle
-	//back face
-	4, 5, 7,
-	5, 6, 7,
-	//left face
-	9, 8, 11,
-	8, 10, 11,
-	//right face
-	12, 13, 14,
-	13, 15, 14,
-	//bottom face
-	16, 18, 17,
-	18, 19, 17,
-	//top face
-	22, 21, 23,
-	21, 20, 23,
-};
-///cube origin posistions
+///object origin posistions
 glm::vec3 objectPositions[10] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
   glm::vec3(2.0f,  5.0f, -15.0f),
@@ -95,6 +39,8 @@ glm::vec3 objectPositions[10] = {
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+std::vector <float> object;
+std::vector <int> indices;
 
 ///Textures______________________________________________________
 unsigned int textureWall;
@@ -150,13 +96,13 @@ unsigned int lightVAO;
 ///initialize the shaders and what they will be processing from the verticies and indicies
 void shadersInit() {
 	//vertex coordinates
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
 	//Normal
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 	//texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 }
 ///_________________________________________________________________________________________________End of function
@@ -177,8 +123,8 @@ void triangleInit() {
 	//call the buffers and assign the triangles points to the buff-
 	//-er, what we are binding, size in data we want to allocate, the data to send to buff-
 	//-er how we want the GPU to manage (how often the data will change))
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(object), object, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, object.size() * sizeof(float), &object[0], GL_STATIC_DRAW);
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -322,7 +268,6 @@ int numOfFaces = 0; //total number of faces for the object
 std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
 
 
-
 std::vector<int> faceSplitter(string word) {
 	stringstream sWord(word);
 	std::vector < int > values;
@@ -339,12 +284,12 @@ std::vector<int> faceSplitter(string word) {
 }
 
 ///Load OBJ
+const char* filename = ".\\Creeper-obj\\Creeper.obj";
 bool loadOBJ() {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
 	glm::vec3 tempNormal;
 
-	const char* filename = ".\\Creeper-obj\\Creeper.obj";
 	cout << "Loading creeper.obj" << endl;
 	 
 	string line;
@@ -417,11 +362,9 @@ bool loadOBJ() {
 }
 ///_________________________________________________________________________________________________End of Function
 
-void objectBuilder() {
-	std::vector <float> object;
-	std::vector <float> indices;
-	
 
+void objectBuilder() {
+	
 	
 	int verticeReadIndex = 0;
 	for (int i = 0; i < numOfFaces; i++) {
@@ -449,6 +392,7 @@ void objectBuilder() {
 			indices.push_back(i * 4 + 3);
 			indices.push_back(i * 4 + 0);
 		}
+
 		else if (faceQuad.at(i) == false) {
 			for (int j = 0; j < 3; j++) {
 				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).x);
@@ -470,7 +414,6 @@ void objectBuilder() {
 			indices.push_back(i * 4 + 2);
 		}
 	}
-
 }
 
 
@@ -480,6 +423,8 @@ int main() {
 	cout << "Press escape to close software..." << endl << endl;
 	loadOBJ();
 	objectBuilder();
+	
+
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
 	glfwInit();
@@ -539,8 +484,8 @@ int main() {
 		basicShaders.run();
 
 		glm::mat4 translation = glm::mat4(1.0f); // must initialize first or it would be null
-		translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
-		float scaleAmount = 0.8f;//sin(glfwGetTime());
+		//translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
+		float scaleAmount = 0.5f;//sin(glfwGetTime());
 		translation = glm::scale(translation, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
 		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
@@ -564,12 +509,12 @@ int main() {
 		for (int i = 0; i < 10; i++) {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(20.0f), glm::vec3(1.0, 0.0, 0.0));
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
+			modelMatrix = glm::rotate(modelMatrix, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			modelLoc = glGetUniformLocation(basicShaders.ID, "model");
 			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-			glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
 		glfwSwapBuffers(window); //another buffer for rendering
