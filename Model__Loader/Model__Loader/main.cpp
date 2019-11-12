@@ -284,14 +284,14 @@ std::vector<int> faceSplitter(string word) {
 }
 
 ///Load OBJ
-const char* filename = ".\\Creeper-obj\\Creeper.obj";
+const char* filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.obj";
 bool loadOBJ() {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
 	glm::vec3 tempNormal;
 
 	cout << "Loading creeper.obj" << endl;
-	 
+
 	string line;
 	ifstream fileRead(filename);
 	string header;
@@ -307,18 +307,21 @@ bool loadOBJ() {
 				linestream >> tempVertice.x >> tempVertice.y >> tempVertice.z;
 				vertices.push_back(tempVertice);
 				//cout << tempVertice.x << tempVertice.y << tempVertice.z << endl;
-			
-			} else if (lineHead == "vt") {
+
+			}
+			else if (lineHead == "vt") {
 				linestream >> tempTexCoord.x >> tempTexCoord.y;
 				textureCoords.push_back(tempTexCoord);
 				//cout << tempTexCoord.x << tempTexCoord.y << endl;
-			
-			} else if (lineHead == "vn") {
+
+			}
+			else if (lineHead == "vn") {
 				linestream >> tempNormal.x >> tempNormal.y >> tempNormal.z;
 				normals.push_back(tempNormal);
 				//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
-			
-			} else if (lineHead == "f") {
+
+			}
+			else if (lineHead == "f") {
 				char c;
 				int numOfWords = 0;
 				for (int i = 0; i < line.length(); i++) {
@@ -327,7 +330,7 @@ bool loadOBJ() {
 						numOfWords++;
 					}
 				}
-				
+
 				if (numOfWords == 4) {
 					string w1, w2, w3, w4;
 					linestream >> w1 >> w2 >> w3 >> w4;
@@ -364,23 +367,23 @@ bool loadOBJ() {
 
 
 void objectBuilder() {
-	
-	
+
+
 	int verticeReadIndex = 0;
 	for (int i = 0; i < numOfFaces; i++) {
 		if (faceQuad.at(i) == true) {
-			
-			for (int j = 0; j < 4; j++) {
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).x);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).y);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex)-1).z);
-				
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex)-1).x);
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex)-1).y);
-				object.push_back(vertices.at(normalIndex.at(verticeReadIndex)-1).z);
 
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex)-1).x);
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex)-1).y);
+			for (int j = 0; j < 4; j++) {
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).y);
+				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).z);
+
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
+				object.push_back(vertices.at(normalIndex.at(verticeReadIndex) - 1).z);
+
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
+				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
 
 				verticeReadIndex++;
 			}
@@ -423,7 +426,7 @@ int main() {
 	cout << "Press escape to close software..." << endl << endl;
 	loadOBJ();
 	objectBuilder();
-	
+
 
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
@@ -449,7 +452,7 @@ int main() {
 	glewInit(); // initialise glew componenets
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
-	
+
 
 	//further Inits
 	triangleInit();
@@ -506,7 +509,7 @@ int main() {
 		glBindVertexArray(VAO);
 
 		//repeate for 10 cubes
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1; i++) {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
