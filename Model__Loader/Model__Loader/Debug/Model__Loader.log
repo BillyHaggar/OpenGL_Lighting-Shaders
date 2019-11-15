@@ -8,5 +8,5 @@ c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loade
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(231): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(232): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(345): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(493): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(492): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe

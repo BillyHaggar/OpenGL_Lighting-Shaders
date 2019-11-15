@@ -39,7 +39,7 @@ glm::vec3 objectPositions[10] = {
 };
 
 
-glm::vec3 lightPosition(3.0f, 2.0f, 2.0f);
+glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
 
 float lightCube[36*3] = {
 		-0.5f, -0.5f, -0.5f,
@@ -439,7 +439,6 @@ void objectBuilder() {
 ///_________________________________________________________________________________________________End of Function
 
 
-
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
@@ -507,21 +506,15 @@ int main() {
 
 		//draw the triangle using the shaders we have initialised
 		basicShaders.run();
-
-		glm::mat4 translation = glm::mat4(1.0f); // must initialize first or it would be null
-		//translation = glm::rotate(translation, (float)glfwGetTime() / 4, glm::vec3(1.0, 0.0, 1.0));
-		float scaleAmount = 0.7f;//sin(glfwGetTime());
-		translation = glm::scale(translation, glm::vec3(scaleAmount, scaleAmount, scaleAmount));
+		lightPosition = cameraPos;
+		basicShaders.setVec3("lightPos", lightPosition);
 		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
-
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-		//viewMatrix = glm::translate(viewMatrix, cameraPos);
 
 		//tranformations
-		basicShaders.setMat4("transform", translation);
 		basicShaders.setMat4("projection", projectionMatrix);
 		basicShaders.setMat4("view", viewMatrix);
 
@@ -540,18 +533,17 @@ int main() {
 		}
 		
 		lightShaders.run();
-		lightShaders.setMat4("transform", translation);
 		lightShaders.setMat4("projection", projectionMatrix);
 		lightShaders.setMat4("view", viewMatrix);
 		
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
-		modelMatrix = glm::scale(translation, glm::vec3(0.4f, 0.4f, 0.4f));
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f)); // a smaller cube
 		lightShaders.setMat4("model", modelMatrix);
 
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
