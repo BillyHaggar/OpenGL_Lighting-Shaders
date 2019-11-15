@@ -22,7 +22,7 @@ const unsigned int windowWidth = 1600; // default value 1600 width
 const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///buffers__________________________________________________
-unsigned int VBO, VAO, EBO, lightVBO, lightEBO;
+unsigned int VBO, VAO, EBO, lightVAO, lightVBO;
 
 ///object origin posistions
 glm::vec3 objectPositions[10] = {
@@ -37,6 +37,8 @@ glm::vec3 objectPositions[10] = {
   glm::vec3(1.5f,  0.2f, -1.5f),
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
+
+
 glm::vec3 lightPosition(3.0f, 2.0f, 2.0f);
 
 float lightCube[36*3] = {
@@ -98,15 +100,7 @@ int textureWidth, textureHeight, nrChannels;
 unsigned char *textureData;
 /*---------------------------------------------------------------------------------------------------------------------------*/
 
-///transformation vector and matrix
-//create a vector {x = 1, y = 0, z = 0, w = 1}
-glm::vec4 vector(1.0f, 0.0f, 0.0f, 1.0);
-//create a translation matrix
-unsigned int transformLoc; // for when transforming a vector to give it a way to store the new location
-///Vclip = Mprojection * Mview * Mmodel * Mlocal variables to pass to vertex shader
-unsigned int projectionLoc;
-unsigned int viewLoc;
-unsigned int modelLoc;
+
 
 ///Camera variables to be used by the view matrix
 //initial stating location of the camera
@@ -135,8 +129,6 @@ float yaw = -90.0f;
 float pitch = 0.0f;
 float fov = 60.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
 
-///lighting variables
-unsigned int lightVAO;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 ///initialize the shaders and what they will be processing from the verticies and indicies
@@ -210,8 +202,6 @@ void lightInit() {
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
-	
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -480,7 +470,7 @@ int main() {
 	glewInit(); // initialise glew componenets
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
-	Shader lightShaders("lightVertex.vs", "mainFragment.fs");
+	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
 
 	//further Inits
 	triangleInit();
@@ -488,14 +478,14 @@ int main() {
 	textureInit();
 	lightInit();
 
-	lightShaders.run();
-	lightShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	glEnable(GL_DEPTH_TEST);
 
 	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
 	basicShaders.setInt("texture2", 1); // or with shader class
+	basicShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	basicShaders.setFloat("ambientLight", 0.3f);
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -531,12 +521,9 @@ int main() {
 		//viewMatrix = glm::translate(viewMatrix, cameraPos);
 
 		//tranformations
-		transformLoc = glGetUniformLocation(basicShaders.ID, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(translation));
-		viewLoc = glGetUniformLocation(basicShaders.ID, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-		projectionLoc = glGetUniformLocation(basicShaders.ID, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+		basicShaders.setMat4("transform", translation);
+		basicShaders.setMat4("projection", projectionMatrix);
+		basicShaders.setMat4("view", viewMatrix);
 
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -547,26 +534,23 @@ int main() {
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
-			modelLoc = glGetUniformLocation(basicShaders.ID, "model");
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+			basicShaders.setMat4("model", modelMatrix);
 
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}
 		
 		lightShaders.run();
+		lightShaders.setMat4("transform", translation);
 		lightShaders.setMat4("projection", projectionMatrix);
 		lightShaders.setMat4("view", viewMatrix);
 		
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::scale(translation, glm::vec3(0.4f, 0.4f, 0.4f));
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
-		modelLoc = glGetUniformLocation(basicShaders.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		lightShaders.setMat4("model", modelMatrix);
 
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-
-		lightShaders.setMat4("model", modelMatrix);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //another buffer for rendering
