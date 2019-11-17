@@ -302,16 +302,15 @@ std::vector<int> faceSplitter(string word) {
 }
 
 ///Load OBJ
-const char* filename = ".\\Creeper-obj\\Creeper.obj";
-bool loadOBJ() {
+bool loadOBJ(const char* filePath) {
 	glm::vec3 tempVertice;
 	glm::vec2 tempTexCoord;
 	glm::vec3 tempNormal;
 
-	cout << "Loading creeper.obj" << endl;
+	cout << "Loading" << filePath << endl;
 
 	string line;
-	ifstream fileRead(filename);
+	ifstream fileRead(filePath);
 	string header;
 
 	if (fileRead.is_open()) {
@@ -383,6 +382,8 @@ bool loadOBJ() {
 }
 ///_________________________________________________________________________________________________End of Function
 
+///Load mtlfile
+
 ///build the object
 void objectBuilder() {
 
@@ -398,7 +399,7 @@ void objectBuilder() {
 
 				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
 				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(vertices.at(normalIndex.at(verticeReadIndex) - 1).z);
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).z);
 
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
@@ -422,7 +423,7 @@ void objectBuilder() {
 
 				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
 				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(vertices.at(normalIndex.at(verticeReadIndex) - 1).z);
+				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).z);
 
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
@@ -443,7 +444,8 @@ void objectBuilder() {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	loadOBJ();
+	const char* filename = ".\\Creeper-obj\\Creeper.obj";
+	loadOBJ(filename);
 	objectBuilder();
 
 	//intialise the required GLFW things
@@ -478,14 +480,13 @@ int main() {
 	lightInit();
 
 
-	glEnable(GL_DEPTH_TEST);
-
 	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
 	basicShaders.setInt("texture2", 1); // or with shader class
 	basicShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	basicShaders.setFloat("ambientLight", 0.3f);
+	basicShaders.setFloat("ambientLight", 0.2f);
 
+	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
 		//calulate time between frames
@@ -506,7 +507,8 @@ int main() {
 
 		//draw the triangle using the shaders we have initialised
 		basicShaders.run();
-		lightPosition = cameraPos;
+		//lightPosition = cameraPos;
+		basicShaders.setVec3("viewPosition", cameraPos);
 		basicShaders.setVec3("lightPos", lightPosition);
 		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
@@ -522,13 +524,13 @@ int main() {
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		//repeate for 10 cubes
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 10; i++) {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f));
+			modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime()/4/*glm::radians(180.0f)*/, glm::vec3(0.0, 1.0, 0.0));
 			basicShaders.setMat4("model", modelMatrix);
-
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}
 		
@@ -543,7 +545,7 @@ int main() {
 
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
