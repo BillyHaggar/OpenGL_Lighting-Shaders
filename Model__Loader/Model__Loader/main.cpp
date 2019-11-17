@@ -38,7 +38,6 @@ glm::vec3 objectPositions[10] = {
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-
 glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
 
 float lightCube[36*3] = {
@@ -88,8 +87,20 @@ std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices elem
 int numOfFaces = 0; //total number of faces for the object
 std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
 
+
 std::vector <float> object;
 std::vector <int> indices;
+
+float Ns;
+glm::vec3 Ka;
+glm::vec3 Kd;
+glm::vec3 Ks;
+glm::vec3 Ke;
+float Ni;
+float d;
+int illum;
+string map_Kd;
+string map_d;
 
 ///Textures______________________________________________________
 unsigned int textureWall;
@@ -99,8 +110,6 @@ int textureWidth, textureHeight, nrChannels;
 //texture data stream when for when reading a image file with stb_library
 unsigned char *textureData;
 /*---------------------------------------------------------------------------------------------------------------------------*/
-
-
 
 ///Camera variables to be used by the view matrix
 //initial stating location of the camera
@@ -267,8 +276,6 @@ void processInput(GLFWwindow *window) {
 		cameraPos += cameraSpeed * cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		cameraPos -= cameraSpeed * cameraFront;;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -283,6 +290,8 @@ void processInput(GLFWwindow *window) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+		lightPosition = cameraPos;
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -384,17 +393,7 @@ bool loadOBJ(const char* filePath) {
 
 ///Load mtlfile
 bool loadMTL(const char* filePath) {
-	float Ns;
-	glm::vec3 Ka;
-	glm::vec3 Kd;
-	glm::vec3 Ks;
-	glm::vec3 Ke;
-	float Ni;
-	float d;
-	int illum;
-	string map_Kd;
-	string map_d;
-
+	
 	cout << "Loading" << filePath << endl;
 
 	string line;
@@ -445,6 +444,13 @@ bool loadMTL(const char* filePath) {
 	return true;
 }
 ///_________________________________________________________________________________________________End of Function
+
+///set MTL to the shaders
+void setMTL() {
+
+}
+///_________________________________________________________________________________________________End of Function
+
 
 ///build the object
 void objectBuilder() {
@@ -506,11 +512,7 @@ void objectBuilder() {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	const char* filename = ".\\Creeper-obj\\Creeper.obj";
-	loadOBJ(filename);
-	filename = ".\\Creeper-obj\\Creeper.mtl";
-	loadMTL(filename);
-	objectBuilder();
+	
 
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
@@ -536,6 +538,22 @@ int main() {
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
 	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
+
+	const char* filename = ".\\Creeper-obj\\Creeper.obj";
+	loadOBJ(filename);
+	filename = ".\\Creeper-obj\\Creeper.mtl";
+	loadMTL(filename);
+	setMTL();
+	objectBuilder();
+
+	basicShaders.setFloat("material.Ns", Ns);
+	basicShaders.setVec3("material.Ka", Ka);
+	basicShaders.setVec3("material.Kd", Kd);
+	basicShaders.setVec3("material.Ks", Ks);
+	basicShaders.setVec3("material.Ke", Ke);
+	basicShaders.setFloat("material.Ni", Ni);
+	basicShaders.setFloat("material.d", d);
+	basicShaders.setInt("material.illum", illum);
 
 	//further Inits
 	triangleInit();
@@ -593,7 +611,7 @@ int main() {
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f));
-			modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime()/4/*glm::radians(180.0f)*/, glm::vec3(0.0, 1.0, 0.0));
+			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			basicShaders.setMat4("model", modelMatrix);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}

@@ -1,12 +1,12 @@
 ﻿  main.cpp
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(213): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(214): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(224): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(225): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(229): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(230): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(231): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(232): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(344): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(557): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(222): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(223): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(233): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(234): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(238): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(239): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(240): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(241): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(353): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(575): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe
