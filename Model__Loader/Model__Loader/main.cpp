@@ -496,12 +496,14 @@ void objectBuilder() {
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
 
+				indices.push_back(i * 3 + 0);
+				indices.push_back(i * 3 + 1);
+				indices.push_back(i * 3 + 2);
+
 				verticeReadIndex++;
 			}
 
-			indices.push_back(i * 4 + 0);
-			indices.push_back(i * 4 + 1);
-			indices.push_back(i * 4 + 2);
+
 		}
 	}
 }
@@ -512,7 +514,11 @@ void objectBuilder() {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	
+	const char* filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.obj";
+	loadOBJ(filename);
+	filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.mtl";
+	loadMTL(filename);
+	objectBuilder();
 
 	//intialise the required GLFW things
 	glewExperimental = GL_TRUE; //needed for some reason unknown
@@ -539,12 +545,7 @@ int main() {
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
 	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
 
-	const char* filename = ".\\Creeper-obj\\Creeper.obj";
-	loadOBJ(filename);
-	filename = ".\\Creeper-obj\\Creeper.mtl";
-	loadMTL(filename);
-	setMTL();
-	objectBuilder();
+	
 
 	basicShaders.setFloat("material.Ns", Ns);
 	basicShaders.setVec3("material.Ka", Ka);
@@ -606,11 +607,11 @@ int main() {
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		//repeate for 10 cubes
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1; i++) {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.09f));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			basicShaders.setMat4("model", modelMatrix);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

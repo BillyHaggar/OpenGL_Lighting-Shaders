@@ -1,14 +1,12 @@
-# Blender MTL File: 'None'
-# Material Count: 1
+#
+#
+#
 
-newmtl Material.004
-Ns 4.499998
+newmtl  Mesh_Material.004
+illum 2
 Ka 1.000000 1.000000 1.000000
 Kd 1.000000 1.000000 1.000000
 Ks 2.000000 2.000000 2.000000
-Ke 0.0 0.0 0.0
-Ni 1.450000
-d 1.000000
-illum 2
+Ns 4.999800
 map_Kd Texture.png
-map_d Texture.png
+
