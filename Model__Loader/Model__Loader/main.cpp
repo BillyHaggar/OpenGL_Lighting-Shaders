@@ -10,6 +10,8 @@
 #include <glm/gtc/type_ptr.hpp>
 ///own header files
 #include "Shader.h"
+#include "Camera.h"
+#include "Material.h"
 ///c++ libraries
 #include <iostream>
 #include <vector>
@@ -87,42 +89,17 @@ std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices elem
 int numOfFaces = 0; //total number of faces for the object
 std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
 
-
 std::vector <float> object;
 std::vector <int> indices;
 
-float Ns;
-glm::vec3 Ka;
-glm::vec3 Kd;
-glm::vec3 Ks;
-glm::vec3 Ke;
-float Ni;
-float d;
-int illum;
-string map_Kd;
-string map_d;
+Camera camera;
+Material material;
 
 ///Textures______________________________________________________
-unsigned int textureWall;
-unsigned int textureFace;
-//texture parameters
+unsigned int texture;
 int textureWidth, textureHeight, nrChannels;
-//texture data stream when for when reading a image file with stb_library
 unsigned char *textureData;
 /*---------------------------------------------------------------------------------------------------------------------------*/
-
-///Camera variables to be used by the view matrix
-//initial stating location of the camera
-glm::vec3 cameraPos = glm::vec3(0.5f, 0.5f, 3.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-//initial variables of the x,y,z coodinates of the camera pointing direction
-//remember that this is acheived by actually mving everything to give the illusion of camera movement
-glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
 //declare the locations for the mouse location
 //Initialise with the original location of the centre of the window
@@ -132,44 +109,28 @@ float lastY = windowHeight / 2;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-//mouse variables, used to know where the camer is pointing, initail variables set the starting location
-bool firstMouse = true;
-float yaw = -90.0f;
-float pitch = 0.0f;
-float fov = 60.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
-
-
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
-///initialize the shaders and what they will be processing from the verticies and indicies
-void shadersInit() {
-	//vertex coordinates
+
+///initialize the buffers and assign data to them
+void buffersInit() {
+	//Main object VAO, VBO, EBO
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	//bind the object/s VAO/VBO ready to assign object data to them
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//vertex coordinates offsets and locations
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(0);
-	//Normal
+	//Normal coordinates offsets and locations
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
-	//texture coord attribute
+	//texture coordinates offsets and locations
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
-}
-///_________________________________________________________________________________________________End of function
-
-///initialize the triangle required functions, CREATE THE BUFFERS NEEDED FOR RENDERING triangles (VERTICIES AND INDICES)
-void triangleInit() {
-	// generate the vertex array object
-	glGenVertexArrays(1, &VAO);
-	//generate the buffers
-	glGenBuffers(1, &VBO);
-	// generate the EBO for sharing points
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//bind the vertex array
-	glBindVertexArray(VAO);
-	//Bind the buffers
-	glGenBuffers(1, &EBO);
+	//Bind data to the buffers
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//call the buffers and assign the triangles points to the buff-
-	//-er, what we are binding, size in data we want to allocate, the data to send to buff-
-	//-er how we want the GPU to manage (how often the data will change))
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, object.size() * sizeof(float), &object[0], GL_STATIC_DRAW);
 }
@@ -179,7 +140,7 @@ void triangleInit() {
 //deal with generating and creating textures ready for the shaders to use
 void textureInit() {
 	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -187,8 +148,8 @@ void textureInit() {
 	stbi_set_flip_vertically_on_load(true);
 	//read the data from file
 	textureData = stbi_load(".\\Creeper-obj\\Texture.png", &textureWidth, &textureHeight, &nrChannels, 0);
-	glGenTextures(1, &textureFace);
-	glBindTexture(GL_TEXTURE_2D, textureFace);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	//create the texture image
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
 	//same for the generation of mipMaps
@@ -198,17 +159,15 @@ void textureInit() {
 }
 ///_________________________________________________________________________________________________End of function
 
-
-///create and initialize all things lighting
+///create qnd fill the VAO, VBO for the light object
 void lightInit() {
-	//generate a seperate VAO for lighting elements
 	glGenVertexArrays(1, &lightVAO);
-	glBindVertexArray(lightVAO); // bind this new VAO
 	glGenBuffers(1, &lightVBO);
+	
+	glBindVertexArray(lightVAO); // bind this new VAO
 	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
 	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 }
@@ -228,11 +187,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 
 	//stop mouse jumping around when first detecting mouse
-	if (firstMouse)
+	if (camera.firstMouse)
 	{
 		lastX = xpos;
 		lastY = ypos;
-		firstMouse = false;
+		camera.firstMouse = false;
 	}
 
 	float xOffset = xpos - lastX;
@@ -244,21 +203,21 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	xOffset *= sensitivity;
 	yOffset *= sensitivity;
 
-	yaw += xOffset;
-	pitch += yOffset;
+	camera.yaw += xOffset;
+	camera.pitch += yOffset;
 
 	//stop the mouse looping round the z axis, can only go as high as the sky and the floor
-	if (pitch < -89.0f)
-		pitch = -89.0;
-	if (pitch > 89.0f)
-		pitch = 89.0f;
+	if (camera.pitch < -89.0f)
+		camera.pitch = -89.0;
+	if (camera.pitch > 89.0f)
+		camera.pitch = 89.0f;
 
 	glm::vec3 front;
-	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	front.y = sin(glm::radians(pitch));
-	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	front.x = cos(glm::radians(camera.pitch)) * cos(glm::radians(camera.yaw));
+	front.y = sin(glm::radians(camera.pitch));
+	front.z = cos(glm::radians(camera.pitch)) * sin(glm::radians(camera.yaw));
 
-	cameraFront = glm::normalize(front);
+	camera.cameraFront = glm::normalize(front);
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -271,17 +230,17 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true); // if true close window
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraUp;
+		camera.cameraPos -= cameraSpeed * camera.cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraUp;
+		camera.cameraPos += cameraSpeed * camera.cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		camera.cameraPos += cameraSpeed * camera.cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;;
+		camera.cameraPos -= cameraSpeed * camera.cameraFront;;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.cameraPos -= glm::normalize(glm::cross(camera.cameraFront, camera.cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.cameraPos += glm::normalize(glm::cross(camera.cameraFront, camera.cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -291,7 +250,7 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-		lightPosition = cameraPos;
+		lightPosition = camera.cameraPos;
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -408,34 +367,34 @@ bool loadMTL(const char* filePath) {
 			linestream >> lineHead;
 
 			if (lineHead == "Ns") {
-				linestream >> Ns;
+				linestream >> material.Ns;
 
 			} else if (lineHead == "Ka") {
-				linestream >> Ka.x >> Ka.y >> Ka.z;
+				linestream >> material.Ka.x >> material.Ka.y >> material.Ka.z;
 
 			} else if (lineHead == "Kd") {
-				linestream >> Kd.x >> Kd.y >> Kd.z;
+				linestream >> material.Kd.x >> material.Kd.y >> material.Kd.z;
 
 			} else if (lineHead == "Ks") {
-				linestream >> Ks.x >> Ks.y >> Ks.z;
+				linestream >> material.Ks.x >> material.Ks.y >> material.Ks.z;
 
 			} else if (lineHead == "Ke") {
-				linestream >> Ke.x >> Ke.y >> Ke.z;
+				linestream >> material.Ke.x >> material.Ke.y >> material.Ke.z;
 
 			} else if (lineHead == "Ni") {
-				linestream >> Ni;
+				linestream >> material.Ni;
 
 			} else if (lineHead == "d") {
-				linestream >> d;
+				linestream >> material.d;
 
 			} else if (lineHead == "illum") {
-				linestream >> illum;
+				linestream >> material.illum;
 
 			} else if (lineHead == "map_Kd") {
-				linestream >> map_Kd;
+				linestream >> material.map_Kd;
 
 			} else if (lineHead == "map_d") {
-				linestream >> map_d;
+				linestream >> material.map_d;
 
 			}
 		}
@@ -446,8 +405,15 @@ bool loadMTL(const char* filePath) {
 ///_________________________________________________________________________________________________End of Function
 
 ///set MTL to the shaders
-void setMTL() {
-
+void setMTL(Shader &shader) {
+	shader.setFloat("material.Ns", material.Ns);
+	shader.setVec3("material.Ka", material.Ka);
+	shader.setVec3("material.Kd", material.Kd);
+	shader.setVec3("material.Ks", material.Ks);
+	shader.setVec3("material.Ke", material.Ke);
+	shader.setFloat("material.Ni", material.Ni);
+	shader.setFloat("material.d", material.d);
+	shader.setInt("material.illum", material.illum);
 }
 ///_________________________________________________________________________________________________End of Function
 
@@ -514,9 +480,9 @@ void objectBuilder() {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	const char* filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.obj";
+	const char* filename = ".\\Creeper-obj\\Creeper.obj";
 	loadOBJ(filename);
-	filename = ".\\LowPolyBoat-obj\\Low_Poly_Boat.mtl";
+	filename = ".\\Creeper-obj\\Creeper.mtl";
 	loadMTL(filename);
 	objectBuilder();
 
@@ -545,29 +511,19 @@ int main() {
 	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
 	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
 
-	
-
-	basicShaders.setFloat("material.Ns", Ns);
-	basicShaders.setVec3("material.Ka", Ka);
-	basicShaders.setVec3("material.Kd", Kd);
-	basicShaders.setVec3("material.Ks", Ks);
-	basicShaders.setVec3("material.Ke", Ke);
-	basicShaders.setFloat("material.Ni", Ni);
-	basicShaders.setFloat("material.d", d);
-	basicShaders.setInt("material.illum", illum);
 
 	//further Inits
-	triangleInit();
-	shadersInit();
+	buffersInit();
 	textureInit();
 	lightInit();
 
-
 	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
-	basicShaders.setInt("texture2", 1); // or with shader class
+	basicShaders.setInt("texture", 0); // or with shader class
 	basicShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	basicShaders.setFloat("ambientLight", 0.2f);
+
+	setMTL(basicShaders);
 
 	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
@@ -584,20 +540,18 @@ int main() {
 
 		//activate and bind the textures we are using
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureWall);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, textureFace);
+		glBindTexture(GL_TEXTURE_2D, texture);
 
 		//draw the triangle using the shaders we have initialised
 		basicShaders.run();
 		//lightPosition = cameraPos;
-		basicShaders.setVec3("viewPosition", cameraPos);
+		basicShaders.setVec3("viewPosition", camera.cameraPos);
 		basicShaders.setVec3("lightPos", lightPosition);
 		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
-		glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
+		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
-		viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
 
 		//tranformations
 		basicShaders.setMat4("projection", projectionMatrix);
@@ -611,7 +565,7 @@ int main() {
 			//model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.09f));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.09f));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			basicShaders.setMat4("model", modelMatrix);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

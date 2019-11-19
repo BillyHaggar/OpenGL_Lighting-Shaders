@@ -16,8 +16,7 @@ struct Material {
 	int illum;
 };
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform sampler2D texture;
 uniform vec3 lightColor;
 uniform float ambientLight;
 uniform vec3 lightPos;
@@ -43,5 +42,5 @@ void main(){
 
 	vec3 result = (ambientLight + diffuse + specular);
 
-	FragColor = texture(texture2, inTexture)  * vec4(result, material.d);
+	FragColor = texture(texture, inTexture)  * vec4(result, material.d);
 }
