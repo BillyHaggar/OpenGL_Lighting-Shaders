@@ -1,10 +1,17 @@
+TO RUN SOFTWARE
+___________________________________________________________________________________________
+
+
 CURRENT FUNCTIONALITY
 ___________________________________________________________________________________________
-- 10 cube objects generated on render
+- object loaded is rendered
 - objects are transformed and rotated each frame
 - camera can be moved around to look around
 - wireframe mode can be enabled and disabeld using keys 3 and 4 (see controls)
 - window viewport resized on window resize
+- lighting enabled and location represented with  a seperate light cube
+- obj files can be read and imported into the rendered object
+- Obj files and be read
 
 CONTROLS
 ___________________________________________________________________________________________
@@ -41,3 +48,6 @@ Left Control key
 
 4 key
 - enable textures and object fill on object/s
+
+5 key
+- teleport light cube to camera position

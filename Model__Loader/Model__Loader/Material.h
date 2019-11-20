@@ -21,7 +21,6 @@ class Material
 {
 public:
 	Material();
-	
 	float Ns;
 	glm::vec3 Ka;
 	glm::vec3 Kd;
@@ -33,67 +32,7 @@ public:
 	string map_Kd;
 	string map_d;
 
-	///Load mtlfile
-	//bool loadMTL(const char* filePath) {
-
-	//	cout << "Loading" << filePath << endl;
-
-	//	string line;
-	//	ifstream fileRead(filePath);
-	//	string header;
-
-	//	if (fileRead.is_open()) {
-	//		while (getline(fileRead, line)) {
-	//			stringstream linestream(line);
-	//			string lineHead;
-	//			linestream >> lineHead;
-
-	//			if (lineHead == "Ns") {
-	//				linestream >> Ns;
-
-	//			}
-	//			else if (lineHead == "Ka") {
-	//				linestream >> Ka.x >> Ka.y >> Ka.z;
-
-	//			}
-	//			else if (lineHead == "Kd") {
-	//				linestream >> Kd.x >> Kd.y >> Kd.z;
-
-	//			}
-	//			else if (lineHead == "Ks") {
-	//				linestream >> Ks.x >> Ks.y >> Ks.z;
-
-	//			}
-	//			else if (lineHead == "Ke") {
-	//				linestream >> Ke.x >> Ke.y >> Ke.z;
-
-	//			}
-	//			else if (lineHead == "Ni") {
-	//				linestream >> Ni;
-
-	//			}
-	//			else if (lineHead == "d") {
-	//				linestream >> d;
-
-	//			}
-	//			else if (lineHead == "illum") {
-	//				linestream >> illum;
-
-	//			}
-	//			else if (lineHead == "map_Kd") {
-	//				linestream >> map_Kd;
-
-	//			}
-	//			else if (lineHead == "map_d") {
-	//				linestream >> map_d;
-
-	//			}
-	//		}
-	//		fileRead.close();
-	//	}
-	//	return true;
-	//}
-	///_________________________________________________________________________________________________End of Function
+	bool loadMTL(const char* filePath, Material &mat);
 };
 
 #ifdef __cplusplus

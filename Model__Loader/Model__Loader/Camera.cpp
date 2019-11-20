@@ -12,14 +12,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
-
+	using namespace std;
 Camera::Camera()
 {
-	init();
-}
-
-void init() {
-	std::cout << "hello from camera" << std::endl;
 
 }
 

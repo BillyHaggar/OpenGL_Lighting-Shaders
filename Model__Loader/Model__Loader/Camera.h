@@ -14,7 +14,7 @@
 extern "C" {
 #endif  // __cplusplus
 
-class Camera
+class Camera 
 {
 public:
 	Camera();
@@ -37,11 +37,11 @@ public:
 	float pitch = 0.0f;
 	float fov = 60.0f; //starting FOV, can be used to give the illusion of zooming in by decreasing (45.0f is a good basis to start)
 
+
 private:
 	
 };
 
-void init();
 
 
 #ifdef __cplusplus

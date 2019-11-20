@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Loader.h"
 ///c++ libraries
 #include <iostream>
 #include <vector>
@@ -25,6 +26,10 @@ const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///buffers__________________________________________________
 unsigned int VBO, VAO, EBO, lightVAO, lightVBO;
+
+///object data______________________________________________
+std::vector <float> object;
+std::vector <int> indices;
 
 ///object origin posistions
 glm::vec3 objectPositions[10] = {
@@ -40,8 +45,12 @@ glm::vec3 objectPositions[10] = {
   glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
+///Textures______________________________________________________
+unsigned int texture;
+int textureWidth, textureHeight, nrChannels;
+unsigned char *textureData;
 
+///light data_________________________________________________
 float lightCube[36*3] = {
 		-0.5f, -0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f,
@@ -80,27 +89,14 @@ float lightCube[36*3] = {
 		-0.5f,  0.5f,  0.5f,
 		-0.5f,  0.5f, -0.5f,
 };
+glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
 
-//temp loaded object data
-std::vector < glm::vec3 > vertices; //vector point for the object
-std::vector < glm::vec2 > textureCoords; // texture coordinates for the object
-std::vector < glm::vec3 > normals;	// normal coordinates for the object
-std::vector < int > vectorIndex, textureIndex, normalIndex; //each vertices element index ((element.at(index) - 1) == index to link to above)
-int numOfFaces = 0; //total number of faces for the object
-std::vector < bool > faceQuad; //for each face there needs to be a specification if that face is a quad or a tri so it can be converted accordingly
-
-std::vector <float> object;
-std::vector <int> indices;
-
+///object creators_______________________________________________
 Camera camera;
 Material material;
+Loader loader;
 
-///Textures______________________________________________________
-unsigned int texture;
-int textureWidth, textureHeight, nrChannels;
-unsigned char *textureData;
-/*---------------------------------------------------------------------------------------------------------------------------*/
-
+///other variables ____________________________________________________
 //declare the locations for the mouse location
 //Initialise with the original location of the centre of the window
 float lastX = windowWidth / 2;
@@ -110,6 +106,17 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
+
+///OpenGl packages all initialisations
+void init() {
+	//intialise the required GLFW things
+	glewExperimental = GL_TRUE; //needed for some reason unknown
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+///_________________________________________________________________________________________________End of function
 
 ///initialize the buffers and assign data to them
 void buffersInit() {
@@ -254,247 +261,22 @@ void processInput(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
-std::vector<int> faceSplitter(string word) {
-	stringstream sWord(word);
-	std::vector < int > values;
-	string token;
-
-	while (getline(sWord, token, '/')) {
-		values.push_back(stoi(token));
-	}
-
-	vectorIndex.push_back(values.at(0));
-	textureIndex.push_back(values.at(1));
-	normalIndex.push_back(values.at(2));
-	return values;
-}
-
-///Load OBJ
-bool loadOBJ(const char* filePath) {
-	glm::vec3 tempVertice;
-	glm::vec2 tempTexCoord;
-	glm::vec3 tempNormal;
-
-	cout << "Loading" << filePath << endl;
-
-	string line;
-	ifstream fileRead(filePath);
-	string header;
-
-	if (fileRead.is_open()) {
-		while (getline(fileRead, line)) {
-			//cout << line << endl;
-			stringstream linestream(line);
-			string lineHead;
-			linestream >> lineHead;
-
-			if (lineHead == "v") {
-				linestream >> tempVertice.x >> tempVertice.y >> tempVertice.z;
-				vertices.push_back(tempVertice);
-				//cout << tempVertice.x << tempVertice.y << tempVertice.z << endl;
-
-			}
-			else if (lineHead == "vt") {
-				linestream >> tempTexCoord.x >> tempTexCoord.y;
-				textureCoords.push_back(tempTexCoord);
-				//cout << tempTexCoord.x << tempTexCoord.y << endl;
-
-			}
-			else if (lineHead == "vn") {
-				linestream >> tempNormal.x >> tempNormal.y >> tempNormal.z;
-				normals.push_back(tempNormal);
-				//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
-
-			}
-			else if (lineHead == "f") {
-				char c;
-				int numOfWords = 0;
-				for (int i = 0; i < line.length(); i++) {
-					c = line.at(i);
-					if (isspace(c)) {
-						numOfWords++;
-					}
-				}
-
-				if (numOfWords == 4) {
-					string w1, w2, w3, w4;
-					linestream >> w1 >> w2 >> w3 >> w4;
-
-					faceSplitter(w1);
-					faceSplitter(w2);
-					faceSplitter(w3);
-					faceSplitter(w4);
-
-					faceQuad.push_back(true);
-
-					numOfFaces++;
-				}
-
-				if (numOfWords == 3) {
-					string w1, w2, w3;
-					linestream >> w1 >> w2 >> w3;
-
-					faceSplitter(w1);
-					faceSplitter(w2);
-					faceSplitter(w3);
-
-					faceQuad.push_back(false);
-
-					numOfFaces++;
-				}
-			}
-		}
-		fileRead.close();
-	}
-	return true;
-}
-///_________________________________________________________________________________________________End of Function
-
-///Load mtlfile
-bool loadMTL(const char* filePath) {
-	
-	cout << "Loading" << filePath << endl;
-
-	string line;
-	ifstream fileRead(filePath);
-	string header;
-
-
-	if (fileRead.is_open()) {
-		while (getline(fileRead, line)) {
-			stringstream linestream(line);
-			string lineHead;
-			linestream >> lineHead;
-
-			if (lineHead == "Ns") {
-				linestream >> material.Ns;
-
-			} else if (lineHead == "Ka") {
-				linestream >> material.Ka.x >> material.Ka.y >> material.Ka.z;
-
-			} else if (lineHead == "Kd") {
-				linestream >> material.Kd.x >> material.Kd.y >> material.Kd.z;
-
-			} else if (lineHead == "Ks") {
-				linestream >> material.Ks.x >> material.Ks.y >> material.Ks.z;
-
-			} else if (lineHead == "Ke") {
-				linestream >> material.Ke.x >> material.Ke.y >> material.Ke.z;
-
-			} else if (lineHead == "Ni") {
-				linestream >> material.Ni;
-
-			} else if (lineHead == "d") {
-				linestream >> material.d;
-
-			} else if (lineHead == "illum") {
-				linestream >> material.illum;
-
-			} else if (lineHead == "map_Kd") {
-				linestream >> material.map_Kd;
-
-			} else if (lineHead == "map_d") {
-				linestream >> material.map_d;
-
-			}
-		}
-		fileRead.close();
-	}
-	return true;
-}
-///_________________________________________________________________________________________________End of Function
-
 ///set MTL to the shaders
-void setMTL(Shader &shader) {
-	shader.setFloat("material.Ns", material.Ns);
-	shader.setVec3("material.Ka", material.Ka);
-	shader.setVec3("material.Kd", material.Kd);
-	shader.setVec3("material.Ks", material.Ks);
-	shader.setVec3("material.Ke", material.Ke);
-	shader.setFloat("material.Ni", material.Ni);
-	shader.setFloat("material.d", material.d);
-	shader.setInt("material.illum", material.illum);
+void setMTL(Shader &shader, Material &mat) {
+	shader.setFloat("material.Ns", mat.Ns);
+	shader.setVec3("material.Ka", mat.Ka);
+	shader.setVec3("material.Kd", mat.Kd);
+	shader.setVec3("material.Ks", mat.Ks);
+	shader.setVec3("material.Ke", mat.Ke);
+	shader.setFloat("material.Ni", mat.Ni);
+	shader.setFloat("material.d", mat.d);
+	shader.setInt("material.illum", mat.illum);
 }
 ///_________________________________________________________________________________________________End of Function
 
-
-///build the object
-void objectBuilder() {
-
-
-	int verticeReadIndex = 0;
-	for (int i = 0; i < numOfFaces; i++) {
-		if (faceQuad.at(i) == true) {
-
-			for (int j = 0; j < 4; j++) {
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).z);
-
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).z);
-
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
-
-				verticeReadIndex++;
-			}
-
-			indices.push_back(i * 4 + 0);
-			indices.push_back(i * 4 + 1);
-			indices.push_back(i * 4 + 2);
-			indices.push_back(i * 4 + 2);
-			indices.push_back(i * 4 + 3);
-			indices.push_back(i * 4 + 0);
-		}
-
-		else if (faceQuad.at(i) == false) {
-			for (int j = 0; j < 3; j++) {
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(vertices.at(vectorIndex.at(verticeReadIndex) - 1).z);
-
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).y);
-				object.push_back(normals.at(normalIndex.at(verticeReadIndex) - 1).z);
-
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
-				object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
-
-				indices.push_back(i * 3 + 0);
-				indices.push_back(i * 3 + 1);
-				indices.push_back(i * 3 + 2);
-
-				verticeReadIndex++;
-			}
-
-
-		}
-	}
-}
-///_________________________________________________________________________________________________End of Function
-
-
-///main program run
-int main() {
-	cout << "Program Running..." << endl;
-	cout << "Press escape to close software..." << endl << endl;
-	const char* filename = ".\\Creeper-obj\\Creeper.obj";
-	loadOBJ(filename);
-	filename = ".\\Creeper-obj\\Creeper.mtl";
-	loadMTL(filename);
-	objectBuilder();
-
-	//intialise the required GLFW things
-	glewExperimental = GL_TRUE; //needed for some reason unknown
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+///initialize the window
+int windowInit(GLFWwindow* window) {
 	//create the window and check to see if the window opened correctly, if not terminate glfw and return error data
-	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	if (window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -505,34 +287,46 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
-
 	glewInit(); // initialise glew componenets
-	//create the shaders needed using the shader header to create the vertex and the fragment shader
-	Shader basicShaders("mainVertex.vs", "mainFragment.fs");
-	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
+}
+///_________________________________________________________________________________________________End of function
 
+///main program run
+int main() {
+	cout << "Program Running..." << endl;
+	cout << "Press escape to close software..." << endl << endl;
+	
+	loader.loadOBJ(".\\Creeper-obj\\Creeper.obj");
+	loader.objectBuilder(object, indices);
+	material.loadMTL(".\\Creeper-obj\\Creeper.mtl", material);
+	init();
+	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);;
+	windowInit(window);
+
+	//create the shaders needed using the shader header to create the vertex and the fragment shader
+	Shader objectShaders("mainVertex.vs", "mainFragment.fs");
+	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
 
 	//further Inits
 	buffersInit();
 	textureInit();
 	lightInit();
 
-	basicShaders.run(); // don't forget to activate the shader before setting uniforms!  
-	glUniform1i(glGetUniformLocation(basicShaders.ID, "texture1"), 0); // set it manually
-	basicShaders.setInt("texture", 0); // or with shader class
-	basicShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	basicShaders.setFloat("ambientLight", 0.2f);
-
-	setMTL(basicShaders);
+	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
+	objectShaders.setInt("texture", 0);
+	objectShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	objectShaders.setFloat("ambientLight", 0.2f);
+	setMTL(objectShaders, material);
 
 	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
+
 	while (!glfwWindowShouldClose(window)) {
 		//calulate time between frames
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-
+		
 		processInput(window);// the key checks above for the escape key to close the window (own version)
 
 		glClearColor(0.15f, 0.15f, 0.15f, 0.3f); //set background render colour
@@ -542,44 +336,37 @@ int main() {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		//draw the triangle using the shaders we have initialised
-		basicShaders.run();
-		//lightPosition = cameraPos;
-		basicShaders.setVec3("viewPosition", camera.cameraPos);
-		basicShaders.setVec3("lightPos", lightPosition);
-		//glm::mat4 orthoMatrix = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-		//projection matrix will give us perspective ( FOV				 ,	viewport w and h for aspect,  NPlane, far plane)		
+		//set up the main shaders and bind ready to render
+		objectShaders.run();
+		objectShaders.setVec3("viewPosition", camera.cameraPos);
+		objectShaders.setVec3("lightPos", lightPosition);	
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
-
-		//tranformations
-		basicShaders.setMat4("projection", projectionMatrix);
-		basicShaders.setMat4("view", viewMatrix);
-
+		objectShaders.setMat4("projection", projectionMatrix);
+		objectShaders.setMat4("view", viewMatrix);
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-		//repeate for 10 cubes
+		//repeate for abount of objects
 		for (int i = 0; i < 1; i++) {
-			//model matrix
+			//change the model matrix for each object
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.09f));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
-			basicShaders.setMat4("model", modelMatrix);
+			objectShaders.setMat4("model", modelMatrix);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		}
-		
+
+		//draw the light cube
 		lightShaders.run();
 		lightShaders.setMat4("projection", projectionMatrix);
 		lightShaders.setMat4("view", viewMatrix);
-		
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f)); // a smaller cube
 		lightShaders.setMat4("model", modelMatrix);
-
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -587,7 +374,6 @@ int main() {
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
 	}
-
 
 	//de-allocate all resources once they've outlived their purpose:
 	glDeleteVertexArrays(1, &VAO);
