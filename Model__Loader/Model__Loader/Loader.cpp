@@ -142,12 +142,12 @@ extern "C" {
 					verticeReadIndex++;
 				}
 
-				indices.push_back(i * 4 + 0);
-				indices.push_back(i * 4 + 1);
-				indices.push_back(i * 4 + 2);
-				indices.push_back(i * 4 + 2);
-				indices.push_back(i * 4 + 3);
-				indices.push_back(i * 4 + 0);
+				indices.push_back(verticeReadIndex - 4);
+				indices.push_back(verticeReadIndex - 3);
+				indices.push_back(verticeReadIndex - 2);
+				indices.push_back(verticeReadIndex - 2);
+				indices.push_back(verticeReadIndex - 1);
+				indices.push_back(verticeReadIndex - 4);
 			}
 
 			else if (faceQuad.at(i) == false) {
@@ -163,13 +163,13 @@ extern "C" {
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
 
-					indices.push_back(i * 3 + 0);
-					indices.push_back(i * 3 + 1);
-					indices.push_back(i * 3 + 2);
+					
 
 					verticeReadIndex++;
 				}
-
+				indices.push_back(verticeReadIndex - 3);
+				indices.push_back(verticeReadIndex - 2);
+				indices.push_back(verticeReadIndex - 1);
 
 			}
 		}
