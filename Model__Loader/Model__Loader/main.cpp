@@ -295,12 +295,12 @@ int windowInit(GLFWwindow* window) {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	
+	std::vector<Material> materials;
 	loader.loadOBJ(".\\LowPolyBoat-obj\\Low_Poly_Boat.obj");
 	loader.objectBuilder(object, indices);
-	material.loadMTL("\\LowPolyBoat-obj\\Low_Poly_Boat.mtl", material);
+	loader.loadMTL(".\\LowPolyBoat-obj\\low_poly_boat.mtl", materials);
 	init();
-	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);;
+	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader

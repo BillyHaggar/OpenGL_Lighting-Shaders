@@ -21,6 +21,7 @@ class Material
 {
 public:
 	Material();
+	string materialName;
 	float Ns;
 	glm::vec3 Ka;
 	glm::vec3 Kd;
@@ -31,8 +32,6 @@ public:
 	int illum;
 	string map_Kd;
 	string map_d;
-
-	bool loadMTL(const char* filePath, Material &mat);
 };
 
 #ifdef __cplusplus

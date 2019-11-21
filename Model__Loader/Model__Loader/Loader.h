@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Material.h"
+
 #include <iostream>
 #include <vector>
 
@@ -21,6 +23,8 @@ extern "C" {
 	public:
 		Loader();
 		bool loadOBJ(const char * filePath);
+		bool loadMTL(const char* filePath, std::vector<Material> &vector);
+
 
 		//temp loaded object data
 		string materialFile;
