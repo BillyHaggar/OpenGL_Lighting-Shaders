@@ -23,13 +23,10 @@ using namespace std;
 ///Settings____________________________________________________
 //set the window height and width here
 const unsigned int windowWidth = 1600; // default value 1600 width
-const unsigned int windowHeight = 1200; // default value 1200 width
+const unsigned int windowHeight = 1200; // default value 1200 widtH
 
 ///buffers__________________________________________________
-unsigned int creeper_VBO, creeper_VAO, creeper_EBO, light_VAO, light_VBO;
-unsigned int boat_VBO, boat_VAO, boat_EBO;
-unsigned int pouf_VBO, pouf_VAO, pouf_EBO;
-unsigned int custom_VBO, custom_VAO, custom_EBO;
+unsigned int light_VAO, light_VBO;
 
 ///object data______________________________________________
 std::vector <float> object;
@@ -47,11 +44,6 @@ glm::vec3 objectPositions[4] = {
 float objectScales[4]{
 	40.3, 0.3, 60.5, 0.3
 };
-
-///Textures______________________________________________________
-unsigned int texture;
-int textureWidth, textureHeight, nrChannels;
-unsigned char * textureData;
 
 ///light data_________________________________________________
 float lightCube[36*3] = {
@@ -122,28 +114,6 @@ void init() {
 }
 ///_________________________________________________________________________________________________End of function
 
-///texture handler
-//deal with generating and creating textures ready for the shaders to use
-void textureInit(const char * texturePath) {
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_set_flip_vertically_on_load(true);
-	//read the data from file
-	textureData = stbi_load(texturePath, &textureWidth, &textureHeight, &nrChannels, 0);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	//create the texture image
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-	//same for the generation of mipMaps
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(textureData); // clear up the data now we dont need it
-
-}
-///_________________________________________________________________________________________________End of function
 
 ///create qnd fill the creeper_VAO, creeper_VBO for the light object
 void lightInit() {
@@ -306,7 +276,7 @@ int main() {
 	objectShaders.setInt("texture", 0);
 	objectShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	objectShaders.setFloat("ambientLight", 0.3f);
-	//setMTL(objectShaders, material);
+	setMTL(objectShaders, material);
 
 	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
@@ -322,9 +292,6 @@ int main() {
 		glClearColor(0.15f, 0.15f, 0.15f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
-		//activate and bind the textures we are using
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, texture);
 
 		//set up the main shaders and bind ready to render
 		objectShaders.run();
@@ -335,17 +302,11 @@ int main() {
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
 		objectShaders.setMat4("projection", projectionMatrix);
 		objectShaders.setMat4("view", viewMatrix);
-		
-		
 
 		//repeate for abount of objects
 		for (int i = 0; i < objects.size(); i++) {
 			glBindVertexArray(objects.at(i).VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
-			//textureInit("image.png");
-			//if (objects.at(i).hasTexture == true) {
-			//	textureInit(".\\creeper-obj\\texture.png");
-			//}
 
 			//change the model matrix for each object
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -353,6 +314,10 @@ int main() {
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(objectScales[i]));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			objectShaders.setMat4("model", modelMatrix);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, objects.at(i).texture);
+
 			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
@@ -362,7 +327,7 @@ int main() {
 		lightShaders.setMat4("view", viewMatrix);
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(10.0f)); // a smaller cube
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(5.0f)); // a smaller cube
 		lightShaders.setMat4("model", modelMatrix);
 		glBindVertexArray(light_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
@@ -378,9 +343,6 @@ int main() {
 		glDeleteBuffers(1, &objects.at(i).VBO);
 		glDeleteBuffers(1, &objects.at(i).EBO);
 	}
-	glDeleteVertexArrays(1, &creeper_VAO);
-	glDeleteBuffers(1, &creeper_VBO);
-	glDeleteBuffers(1, &creeper_EBO);
 	glDeleteVertexArrays(1, &light_VAO);
 	glDeleteBuffers(1, &light_VBO);
 

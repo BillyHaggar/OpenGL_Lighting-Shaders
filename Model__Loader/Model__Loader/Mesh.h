@@ -26,6 +26,11 @@ public:
 	std::vector<int> indices;
 	bool hasTexture;
 
+	///Textures______________________________________________________
+	unsigned int texture;
+	int textureWidth, textureHeight, nrChannels;
+	unsigned char * textureData;
+
 
 };
 

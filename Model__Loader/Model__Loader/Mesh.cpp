@@ -1,3 +1,6 @@
+
+#include "stb_image.h"
+
 #include "Mesh.h"
 
 #include "GL/glew.h"
@@ -45,6 +48,31 @@ void Mesh::setupMesh() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, object.size() * sizeof(float), &object[0], GL_STATIC_DRAW);
+
+
+	///REALLY MESSY NEED TO FIX TEXTURES
+	const char * texturePath;
+	texturePath = "image.png";
+	if (hasTexture == true) {
+		texturePath = ".\\creeper-obj\\texture.png";
+	}
+
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_set_flip_vertically_on_load(true);
+	//read the data from file
+	textureData = stbi_load(texturePath, &textureWidth, &textureHeight, &nrChannels, 0);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	//create the texture image
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+	//same for the generation of mipMaps
+	glGenerateMipmap(GL_TEXTURE_2D);
+	stbi_image_free(textureData); // clear up the data now we dont need it
 }
 
 #ifdef __cplusplus
