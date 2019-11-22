@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "Material.h"
 #include "Loader.h"
+#include "Mesh.h"
 ///c++ libraries
 #include <iostream>
 #include <vector>
@@ -25,30 +26,32 @@ const unsigned int windowWidth = 1600; // default value 1600 width
 const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///buffers__________________________________________________
-unsigned int VBO, VAO, EBO, lightVAO, lightVBO;
+unsigned int creeper_VBO, creeper_VAO, creeper_EBO, light_VAO, light_VBO;
+unsigned int boat_VBO, boat_VAO, boat_EBO;
+unsigned int pouf_VBO, pouf_VAO, pouf_EBO;
+unsigned int custom_VBO, custom_VAO, custom_EBO;
 
 ///object data______________________________________________
 std::vector <float> object;
 std::vector <int> indices;
 
 ///object origin posistions
-glm::vec3 objectPositions[10] = {
+glm::vec3 objectPositions[4] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(2.0f,  5.0f, -15.0f),
-  glm::vec3(-1.5f, -2.2f, -2.5f),
-  glm::vec3(-3.8f, -2.0f, -12.3f),
-  glm::vec3(2.4f, -0.4f, -3.5f),
-  glm::vec3(-1.7f,  3.0f, -7.5f),
-  glm::vec3(1.3f, -2.0f, -2.5f),
-  glm::vec3(1.5f,  2.0f, -2.5f),
-  glm::vec3(1.5f,  0.2f, -1.5f),
-  glm::vec3(-1.3f,  1.0f, -1.5f)
+  glm::vec3(75.0f,  0.0f, 0.0f),
+  glm::vec3(140.f, 0.0f, 0.0f),
+  glm::vec3(210.0f, 0.0f, 0.0f),
+};
+
+///scale of objects
+float objectScales[4]{
+	40.3, 0.3, 60.5, 0.3
 };
 
 ///Textures______________________________________________________
 unsigned int texture;
 int textureWidth, textureHeight, nrChannels;
-unsigned char *textureData;
+unsigned char * textureData;
 
 ///light data_________________________________________________
 float lightCube[36*3] = {
@@ -95,6 +98,7 @@ glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
 Camera camera;
 Material material;
 Loader loader;
+std::vector<Mesh> objects;
 
 ///other variables ____________________________________________________
 //declare the locations for the mouse location
@@ -118,34 +122,9 @@ void init() {
 }
 ///_________________________________________________________________________________________________End of function
 
-///initialize the buffers and assign data to them
-void buffersInit() {
-	//Main object VAO, VBO, EBO
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	//bind the object/s VAO/VBO ready to assign object data to them
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//vertex coordinates offsets and locations
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
-	glEnableVertexAttribArray(0);
-	//Normal coordinates offsets and locations
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	//texture coordinates offsets and locations
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-	//Bind data to the buffers
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, object.size() * sizeof(float), &object[0], GL_STATIC_DRAW);
-}
-///_________________________________________________________________________________________________End of function
-
 ///texture handler
 //deal with generating and creating textures ready for the shaders to use
-void textureInit() {
+void textureInit(const char * texturePath) {
 	// set the texture wrapping parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -154,7 +133,7 @@ void textureInit() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	stbi_set_flip_vertically_on_load(true);
 	//read the data from file
-	textureData = stbi_load(".\\Creeper-obj\\Texture.png", &textureWidth, &textureHeight, &nrChannels, 0);
+	textureData = stbi_load(texturePath, &textureWidth, &textureHeight, &nrChannels, 0);
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//create the texture image
@@ -166,13 +145,13 @@ void textureInit() {
 }
 ///_________________________________________________________________________________________________End of function
 
-///create qnd fill the VAO, VBO for the light object
+///create qnd fill the creeper_VAO, creeper_VBO for the light object
 void lightInit() {
-	glGenVertexArrays(1, &lightVAO);
-	glGenBuffers(1, &lightVBO);
+	glGenVertexArrays(1, &light_VAO);
+	glGenBuffers(1, &light_VBO);
 	
-	glBindVertexArray(lightVAO); // bind this new VAO
-	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+	glBindVertexArray(light_VAO); // bind this new creeper_VAO
+	glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
 	
 	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -232,7 +211,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 // Basic function to check for inputs
 void processInput(GLFWwindow *window) {
 
-	float cameraSpeed = 4.5f * deltaTime;
+	float cameraSpeed = 30.0f * deltaTime;
 	//check for the escape key and check if its been pressed
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true); // if true close window
@@ -290,33 +269,44 @@ int windowInit(GLFWwindow* window) {
 	glewInit(); // initialise glew componenets
 }
 ///_________________________________________________________________________________________________End of function
+void loadObjects(const char * objPath, const char * mtlPath) {
+	Loader loaderTemp;
+	std::vector <float> objectTemp;
+	std::vector <int> indicesTemp;
+	std::vector<Material> materialsTemp;
+	loaderTemp.loadOBJ(objPath);
+	loaderTemp.loadMTL(mtlPath, materialsTemp);
+	loaderTemp.objectBuilder(objectTemp, indicesTemp, materialsTemp);
+	Mesh tempMesh(objectTemp, indicesTemp, loaderTemp.hasTexture);
+	objects.push_back(tempMesh);
+}
 
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-	std::vector<Material> materials;
-	loader.loadOBJ(".\\LowPolyBoat-obj\\Low_Poly_Boat.obj");
-	loader.objectBuilder(object, indices);
-	loader.loadMTL(".\\LowPolyBoat-obj\\low_poly_boat.mtl", materials);
+
 	init();
+
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
+	loadObjects(".\\Creeper-obj\\Creeper.obj", ".\\Creeper-obj\\Creeper.mtl");
+	loadObjects(".\\LowPolyBoat-obj\\Low_Poly_Boat.obj",".\\LowPolyBoat-obj\\Low_Poly_Boat.mtl");
+	loadObjects(".\\pouf-obj\\pouf.obj", ".\\pouf-obj\\pouf.mtl");
+	loadObjects(".\\Custom-obj\\Custom.obj", ".\\Custom-obj\\Custom.mtl");
+	
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("mainVertex.vs", "mainFragment.fs");
 	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
 
-	//further Inits
-	buffersInit();
-	textureInit();
 	lightInit();
 
 	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	objectShaders.setInt("texture", 0);
 	objectShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	objectShaders.setFloat("ambientLight", 0.2f);
-	setMTL(objectShaders, material);
+	objectShaders.setFloat("ambientLight", 0.3f);
+	//setMTL(objectShaders, material);
 
 	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
@@ -333,8 +323,8 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
 		//activate and bind the textures we are using
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, texture);
 
 		//set up the main shaders and bind ready to render
 		objectShaders.run();
@@ -345,18 +335,25 @@ int main() {
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
 		objectShaders.setMat4("projection", projectionMatrix);
 		objectShaders.setMat4("view", viewMatrix);
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		
+		
 
 		//repeate for abount of objects
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < objects.size(); i++) {
+			glBindVertexArray(objects.at(i).VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
+			//textureInit("image.png");
+			//if (objects.at(i).hasTexture == true) {
+			//	textureInit(".\\creeper-obj\\texture.png");
+			//}
+
 			//change the model matrix for each object
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.09f));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(objectScales[i]));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			objectShaders.setMat4("model", modelMatrix);
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
 		//draw the light cube
@@ -365,10 +362,10 @@ int main() {
 		lightShaders.setMat4("view", viewMatrix);
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.1f)); // a smaller cube
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(10.0f)); // a smaller cube
 		lightShaders.setMat4("model", modelMatrix);
-		glBindVertexArray(lightVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+		glBindVertexArray(light_VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window); //another buffer for rendering
@@ -376,11 +373,16 @@ int main() {
 	}
 
 	//de-allocate all resources once they've outlived their purpose:
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteVertexArrays(1, &lightVAO);
-	glDeleteBuffers(1, &lightVBO);
-	glDeleteBuffers(1, &EBO);
+	for (int i = 0; i < objects.size(); i++) {
+		glDeleteVertexArrays(1, &objects.at(i).VAO);
+		glDeleteBuffers(1, &objects.at(i).VBO);
+		glDeleteBuffers(1, &objects.at(i).EBO);
+	}
+	glDeleteVertexArrays(1, &creeper_VAO);
+	glDeleteBuffers(1, &creeper_VBO);
+	glDeleteBuffers(1, &creeper_EBO);
+	glDeleteVertexArrays(1, &light_VAO);
+	glDeleteBuffers(1, &light_VBO);
 
 	//clean up and close down correctly
 	glfwDestroyWindow(window);

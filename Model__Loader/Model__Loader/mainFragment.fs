@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec3 inNormal;
 in vec2 inTexture;
 in vec3 fragPosition;
+in vec3 inColor;
 
 struct Material {
 	float Ns;
@@ -29,7 +30,7 @@ void main(){
 	vec3 norm = normalize(inNormal);
 	vec3 lightDir = normalize(lightPos - fragPosition);  
 	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * lightColor;
+	vec3 diffuse = (diff * inColor) * (lightColor);
 
 	//specular
 	float specularStrength = 1.0;
@@ -40,7 +41,8 @@ void main(){
 	vec3 specular = specularStrength * spec * lightColor; 
 
 
-	vec3 result = (ambientLight + diffuse + specular);
+	vec3 result = (ambientLight + diffuse + specular) * inColor;
 
-	FragColor = texture(texture, inTexture)  * vec4(result, material.d);
+
+	FragColor = texture(texture, inTexture) * vec4(result, material.d);
 }

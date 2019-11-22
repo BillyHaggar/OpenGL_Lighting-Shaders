@@ -47,6 +47,7 @@ extern "C" {
 		string line;
 		ifstream fileRead(filePath);
 		string header;
+		string mtl;
 
 		if (fileRead.is_open()) {
 			while (getline(fileRead, line)) {
@@ -76,6 +77,9 @@ extern "C" {
 					//cout << tempNormal.x << tempNormal.y << tempNormal.z << endl;
 
 				}
+				else if (lineHead == "usemtl") {
+					linestream >> mtl;
+				}
 				else if (lineHead == "f") {
 					char c;
 					int numOfWords = 0;
@@ -96,6 +100,7 @@ extern "C" {
 						faceSplitter(w4);
 
 						faceQuad.push_back(true);
+						faceMtl.push_back(mtl);
 
 						numOfFaces++;
 					}
@@ -109,6 +114,7 @@ extern "C" {
 						faceSplitter(w3);
 
 						faceQuad.push_back(false);
+						faceMtl.push_back(mtl);
 
 						numOfFaces++;
 					}
@@ -116,13 +122,32 @@ extern "C" {
 			}
 			fileRead.close();
 		}
+		cout << "Loading Complete" << endl;
 		return true;
 	}
 	///_________________________________________________________________________________________________End of Function
 
 	///build the object
-	void Loader::objectBuilder(std::vector <float> &object, std::vector <int> &indices) {
-
+	void Loader::objectBuilder(std::vector <float> &object, std::vector <int> &indices, std::vector<Material> materials) {
+		cout << "Building object..." << endl;
+		
+		bool noMatch = true;
+		//add colour(kd) to it
+		for (int i = 0; i < numOfFaces; i++) {
+			noMatch = true;
+			for (int j = 0; j < materials.size(); j++) {
+				if (materials.at(j).materialName == faceMtl.at(i)) {
+					//cout << materials.at(j).Kd.x << ", " << materials.at(j).Kd.y << ", " << materials.at(j).Kd.z << endl;
+					colors.push_back(materials.at(j).Kd);
+					noMatch = false;
+				}
+			} 
+			if (noMatch == true) {
+				colors.push_back(materials.at(0).Kd);
+			}
+		
+		}
+		
 
 		int verticeReadIndex = 0;
 		for (int i = 0; i < numOfFaces; i++) {
@@ -140,6 +165,10 @@ extern "C" {
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
 
+					object.push_back(colors.at(i).x);
+					object.push_back(colors.at(i).y);
+					object.push_back(colors.at(i).z);
+					
 					verticeReadIndex++;
 				}
 
@@ -164,7 +193,9 @@ extern "C" {
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).x);
 					object.push_back(textureCoords.at(textureIndex.at(verticeReadIndex) - 1).y);
 
-					
+					object.push_back(colors.at(i).x);
+					object.push_back(colors.at(i).y);
+					object.push_back(colors.at(i).z);
 
 					verticeReadIndex++;
 				}
@@ -174,6 +205,7 @@ extern "C" {
 
 			}
 		}
+		cout << "Building Complete" << endl;
 	}
 	///_________________________________________________________________________________________________End of Function
 
@@ -231,7 +263,9 @@ extern "C" {
 				}
 				else if (lineHead == "map_Kd") {
 					linestream >> mat.map_Kd;
-
+					if (mat.map_Kd != "") {
+						Loader::hasTexture = true;
+					}
 				}
 				else if (lineHead == "map_d") {
 					linestream >> mat.map_d;
@@ -246,6 +280,7 @@ extern "C" {
 
 			vector.push_back(mat);
 		}
+		cout << "Loading Complete" << endl;
 		return true;
 	}
 	///_________________________________________________________________________________________________End of Function
