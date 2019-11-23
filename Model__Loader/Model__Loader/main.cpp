@@ -28,10 +28,6 @@ const unsigned int windowHeight = 1200; // default value 1200 widtH
 ///buffers__________________________________________________
 unsigned int light_VAO, light_VBO;
 
-///object data______________________________________________
-std::vector <float> object;
-std::vector <int> indices;
-
 ///object origin posistions
 glm::vec3 objectPositions[4] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
@@ -84,7 +80,7 @@ float lightCube[36*3] = {
 		-0.5f,  0.5f,  0.5f,
 		-0.5f,  0.5f, -0.5f,
 };
-glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPosition(100.0, 35.0, 110.0);
 
 ///object creators_______________________________________________
 Camera camera;
@@ -177,6 +173,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 ///_________________________________________________________________________________________________End of function
 
+///Key callback for keypresses we dont want to be repeated
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_E && action == GLFW_RELEASE && objects.size() > 3)
+		objects.pop_back();
+}
+///_________________________________________________________________________________________________End of function
+
 ///Input handler
 // Basic function to check for inputs
 void processInput(GLFWwindow *window) {
@@ -185,9 +189,9 @@ void processInput(GLFWwindow *window) {
 	//check for the escape key and check if its been pressed
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true); // if true close window
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		camera.cameraPos -= cameraSpeed * camera.cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.cameraPos -= cameraSpeed * camera.cameraUp;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		camera.cameraPos += cameraSpeed * camera.cameraUp;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.cameraPos += cameraSpeed * camera.cameraFront;
@@ -206,7 +210,7 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-		lightPosition = camera.cameraPos;
+		lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -236,9 +240,11 @@ int windowInit(GLFWwindow* window) {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetKeyCallback(window, key_callback);
 	glewInit(); // initialise glew componenets
 }
 ///_________________________________________________________________________________________________End of function
+
 void loadObjects(const char * objPath, const char * mtlPath) {
 	Loader loaderTemp;
 	std::vector <float> objectTemp;
@@ -258,17 +264,18 @@ int main() {
 
 	init();
 
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
-	loadObjects(".\\Creeper-obj\\Creeper.obj", ".\\Creeper-obj\\Creeper.mtl");
-	loadObjects(".\\LowPolyBoat-obj\\Low_Poly_Boat.obj",".\\LowPolyBoat-obj\\Low_Poly_Boat.mtl");
-	loadObjects(".\\pouf-obj\\pouf.obj", ".\\pouf-obj\\pouf.mtl");
-	loadObjects(".\\Custom-obj\\Custom.obj", ".\\Custom-obj\\Custom.mtl");
-	
+	loadObjects("Media\\Objects\\Creeper-obj\\Creeper.obj", "Media\\Objects\\Creeper-obj\\Creeper.mtl");
+	loadObjects("Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.obj","Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.mtl");
+	loadObjects("Media\\Objects\\pouf-obj\\pouf.obj", "Media\\Objects\\pouf-obj\\pouf.mtl");
+	loadObjects("Media\\Objects\\Custom-obj\\Custom.obj", "Media\\Objects\\Custom-obj\\Custom.mtl");
+
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
-	Shader objectShaders("mainVertex.vs", "mainFragment.fs");
-	Shader lightShaders("lightVertex.vs", "lightFragment.fs");
+	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
+	Shader lightShaders("Media\\Shaders\\lightVertex.vs", "Media\\Shaders\\lightFragment.fs");
 
 	lightInit();
 
@@ -278,9 +285,10 @@ int main() {
 	objectShaders.setFloat("ambientLight", 0.3f);
 	setMTL(objectShaders, material);
 
+	glfwShowWindow(window);
+
 	glEnable(GL_DEPTH_TEST);
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
-
 	while (!glfwWindowShouldClose(window)) {
 		//calulate time between frames
 		float currentFrame = glfwGetTime();
@@ -289,7 +297,7 @@ int main() {
 		
 		processInput(window);// the key checks above for the escape key to close the window (own version)
 
-		glClearColor(0.15f, 0.15f, 0.15f, 0.3f); //set background render colour
+		glClearColor(0.25f, 0.25f, 0.35f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
 
@@ -327,7 +335,7 @@ int main() {
 		lightShaders.setMat4("view", viewMatrix);
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, lightPosition);
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(5.0f)); // a smaller cube
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(2.0f)); // a smaller cube
 		lightShaders.setMat4("model", modelMatrix);
 		glBindVertexArray(light_VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);

@@ -131,17 +131,15 @@
     <ClCompile Include="Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lightFragment.fs" />
-    <None Include="lightVertex.vs" />
-    <None Include="mainFragment.fs" />
-    <None Include="mainVertex.vs" />
+    <None Include="Media\Objects\Creeper-obj\Creeper.mtl" />
+    <None Include="Media\Objects\Custom-obj\Custom.mtl" />
+    <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
+    <None Include="Media\Objects\Pouf-obj\pouf.mtl" />
+    <None Include="Media\Shaders\lightFragment.fs" />
+    <None Include="Media\Shaders\lightVertex.vs" />
+    <None Include="Media\Shaders\mainFragment.fs" />
+    <None Include="Media\Shaders\mainVertex.vs" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="awesomeface.PNG" />
-    <Image Include="Image.png" />
-    <Image Include="Texture.png" />
-    <Image Include="wall.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -160,6 +158,36 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Media\Image.png" />
+    <Image Include="Media\Objects\Creeper-obj\Texture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Media\Objects\Creeper-obj\Creeper.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Media\Objects\Custom-obj\Custom.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Media\Objects\Pouf-obj\pouf.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

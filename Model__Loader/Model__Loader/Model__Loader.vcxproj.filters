@@ -36,32 +36,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="mainFragment.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="mainVertex.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightFragment.fs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="lightVertex.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="wall.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="awesomeface.PNG">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Image.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Texture.png">
-      <Filter>Resource Files</Filter>
-    </Image>
+    <None Include="Media\Shaders\lightFragment.fs" />
+    <None Include="Media\Shaders\lightVertex.vs" />
+    <None Include="Media\Shaders\mainFragment.fs" />
+    <None Include="Media\Shaders\mainVertex.vs" />
+    <None Include="Media\Objects\Pouf-obj\pouf.mtl" />
+    <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
+    <None Include="Media\Objects\Custom-obj\Custom.mtl" />
+    <None Include="Media\Objects\Creeper-obj\Creeper.mtl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">
@@ -82,5 +64,19 @@
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Media\Image.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Media\Objects\Creeper-obj\Texture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Media\Objects\Pouf-obj\pouf.obj" />
+    <Object Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.obj" />
+    <Object Include="Media\Objects\Custom-obj\Custom.obj" />
+    <Object Include="Media\Objects\Creeper-obj\Creeper.obj" />
   </ItemGroup>
 </Project>

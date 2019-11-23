@@ -20,7 +20,7 @@ public:
 	Camera();
 	
 	//initial stating location of the camera
-	glm::vec3 cameraPos = glm::vec3(100.0, 35.0, 100.0);;
+	glm::vec3 cameraPos = glm::vec3(100.0, 35.0, 100.0);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 

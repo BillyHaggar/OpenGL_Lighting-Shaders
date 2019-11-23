@@ -42,7 +42,7 @@ extern "C" {
 
 	///Load OBJ
 	bool Loader::loadOBJ(const char * filePath) {
-		cout << "Loading" << filePath << endl;
+		cout << "Loading: " << filePath << endl;
 
 		string line;
 		ifstream fileRead(filePath);
@@ -205,7 +205,7 @@ extern "C" {
 
 			}
 		}
-		cout << "Building Complete" << endl;
+		cout << "Building Complete" << endl << endl;
 	}
 	///_________________________________________________________________________________________________End of Function
 
@@ -213,7 +213,7 @@ extern "C" {
 	bool Loader::loadMTL(const char* filePath, std::vector<Material> &vector) {
 
 		Material mat;
-		cout << "Loading" << filePath << endl;
+		cout << "Loading: " << filePath << endl;
 
 		string line;
 		ifstream fileRead(filePath);

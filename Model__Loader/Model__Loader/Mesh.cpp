@@ -52,9 +52,9 @@ void Mesh::setupMesh() {
 
 	///REALLY MESSY NEED TO FIX TEXTURES
 	const char * texturePath;
-	texturePath = "image.png";
+	texturePath = "Media\\Image.png";
 	if (hasTexture == true) {
-		texturePath = ".\\creeper-obj\\texture.png";
+		texturePath = "Media\\Objects\\Creeper-obj\\Texture.png";
 	}
 
 	// set the texture wrapping parameters
