@@ -173,15 +173,29 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 ///_________________________________________________________________________________________________End of function
 
+bool wireframe = false;
+bool mouse = false;
+bool lightFollow = false;
 ///Key callback for keypresses we dont want to be repeated
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	if (key == GLFW_KEY_E && action == GLFW_RELEASE && objects.size() > 3)
+	if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
+		mouse = !mouse;
+		mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);;;
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
+		wireframe = !wireframe;
+		wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);;
+	}
+	if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
+		lightFollow = !lightFollow;
+	}
+	if (key == GLFW_KEY_4 && action == GLFW_RELEASE && objects.size() > 3) //only allow to go down to 3
 		objects.pop_back();
 }
 ///_________________________________________________________________________________________________End of function
 
-///Input handler
+///Input handler for movement
 // Basic function to check for inputs
 void processInput(GLFWwindow *window) {
 
@@ -201,16 +215,6 @@ void processInput(GLFWwindow *window) {
 		camera.cameraPos -= glm::normalize(glm::cross(camera.cameraFront, camera.cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.cameraPos += glm::normalize(glm::cross(camera.cameraFront, camera.cameraUp)) * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-		lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -245,6 +249,7 @@ int windowInit(GLFWwindow* window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+/// load an obj object, call all functions and create the mesh needed to run the object
 void loadObjects(const char * objPath, const char * mtlPath) {
 	Loader loaderTemp;
 	std::vector <float> objectTemp;
@@ -256,6 +261,7 @@ void loadObjects(const char * objPath, const char * mtlPath) {
 	Mesh tempMesh(objectTemp, indicesTemp, loaderTemp.hasTexture);
 	objects.push_back(tempMesh);
 }
+///_________________________________________________________________________________________________End of function
 
 ///main program run
 int main() {
@@ -328,19 +334,23 @@ int main() {
 
 			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
-
-		//draw the light cube
-		lightShaders.run();
-		lightShaders.setMat4("projection", projectionMatrix);
-		lightShaders.setMat4("view", viewMatrix);
-		glm::mat4 modelMatrix = glm::mat4(1.0f);
-		modelMatrix = glm::translate(modelMatrix, lightPosition);
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(2.0f)); // a smaller cube
-		lightShaders.setMat4("model", modelMatrix);
-		glBindVertexArray(light_VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
+		
+		if (!lightFollow) {
+			//draw the light cube when not following camera, else move light with camera
+			lightShaders.run();
+			lightShaders.setMat4("projection", projectionMatrix);
+			lightShaders.setMat4("view", viewMatrix);
+			glm::mat4 modelMatrix = glm::mat4(1.0f);
+			modelMatrix = glm::translate(modelMatrix, lightPosition);
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(2.0f)); // a smaller cube
+			lightShaders.setMat4("model", modelMatrix);
+			glBindVertexArray(light_VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		else {
+			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
+		}
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
 	}

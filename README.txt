@@ -1,22 +1,27 @@
-TO RUN SOFTWARE
-___________________________________________________________________________________________
+##MODEL LOADER  
+
+This is all about the `MODEL LOADER`
+  
+
+##How to Run
+
+- Put the deets here
+- move them legs really fast
+- one in front of the other
 
 
-CURRENT FUNCTIONALITY
-___________________________________________________________________________________________
-- object loaded is rendered
-- objects are transformed and rotated each frame
-- camera can be moved around to look around
-- wireframe mode can be enabled and disabeld using keys 3 and 4 (see controls)
-- window viewport resized on window resize
-- lighting enabled and location represented with  a seperate light cube
-- obj files can be read and imported into the rendered object
-- Obj files and be read
+##Current Functionality
 
-CONTROLS
-___________________________________________________________________________________________
+ - .obj files are loaded
+ - 4 .obj based objects are loaded and rendered
+ - lighting implemented
+ - Camera implemented
+ - Meshes implemented
+ - ADD TO THIS AND MAKE IT MORE INDEPTH
 
-Mouse Control
+##CONTROLS
+######Camera 
+
 - moving the mouse around will move around the x and y axis of whare the camera is pointing
 
 W key
@@ -37,17 +42,26 @@ Left Shift key
 Left Control key
 - move camera down on z axis (decrease height)
 
+######Enable Features
 1 key
-- enable mouse visibility again
+- Toggle mouse visibility on/off
 
 2 key
-- focus mouse back to window
+- Toggle wire-frame visibility for objects on/off
 
 3 key
-- enable wireframe mode for the object/s
+- Toggle whether the camera follows the camera or stays still on/off
 
 4 key
-- enable textures and object fill on object/s
+- Remove object from being rendered (Will remove objects in reverse loaded order down to a minimum of 3 objects)
 
-5 key
-- teleport light cube to camera position
+
+##Development Process
+#### Beginnings 
+ When starting development... 
+
+#### Main Development
+ Later in development after the main set up for rendering was achieved...
+
+#### Later Features
+ Some later features can be added, these are...
