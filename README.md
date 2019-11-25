@@ -1,16 +1,16 @@
-##MODEL LOADER  
+## MODEL LOADER  
 
 This is all about the `MODEL LOADER`
   
 
-##How to Run
+## How to Run
 
 - Put the deets here
 - move them legs really fast
 - one in front of the other
 
 
-##Current Functionality
+## Current Functionality
 
  - .obj files are loaded
  - 4 .obj based objects are loaded and rendered
@@ -19,8 +19,8 @@ This is all about the `MODEL LOADER`
  - Meshes implemented
  - ADD TO THIS AND MAKE IT MORE INDEPTH
 
-##CONTROLS
-######Camera 
+## CONTROLS
+###### Camera 
 
 - moving the mouse around will move around the x and y axis of whare the camera is pointing
 
@@ -42,7 +42,7 @@ Left Shift key
 Left Control key
 - move camera down on z axis (decrease height)
 
-######Enable Features
+###### Enable Features
 1 key
 - Toggle mouse visibility on/off
 
@@ -56,7 +56,7 @@ Left Control key
 - Remove object from being rendered (Will remove objects in reverse loaded order down to a minimum of 3 objects)
 
 
-##Development Process
+## Development Process
 #### Beginnings 
  When starting development... 
 
