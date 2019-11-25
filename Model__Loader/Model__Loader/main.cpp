@@ -29,16 +29,20 @@ const unsigned int windowHeight = 1200; // default value 1200 widtH
 unsigned int light_VAO, light_VBO;
 
 ///object origin posistions
-glm::vec3 objectPositions[4] = {
+glm::vec3 objectPositions[8] = {
   glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(75.0f,  0.0f, 0.0f),
+  glm::vec3(70.0f,  0.0f, 0.0f),
   glm::vec3(140.f, 0.0f, 0.0f),
   glm::vec3(210.0f, 0.0f, 0.0f),
+  glm::vec3(280.0f, 0.0f, 0.0f),
+  glm::vec3(350.0f, 0.0f, 0.0f),
+  glm::vec3(420.0f, 0.0f, 0.0f),
+  glm::vec3(490.0f, 0.0f, 0.0f),
 };
 
 ///scale of objects
-float objectScales[4]{
-	40.3, 0.3, 60.5, 0.3
+float objectScales[8]{
+	40.0, 0.3, 60.0, 0.3, 0.3, 0.3, 0.3, 0.3
 };
 
 ///light data_________________________________________________
@@ -88,6 +92,14 @@ Material material;
 Loader loader;
 std::vector<Mesh> objects;
 
+struct objectPaths {
+	string name;
+	const char * objectPath;
+	const char * mtlPath;
+	const char * basePath;
+}creeper, boat, pouf, custom;
+
+
 ///other variables ____________________________________________________
 //declare the locations for the mouse location
 //Initialise with the original location of the centre of the window
@@ -107,6 +119,30 @@ void init() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+///_________________________________________________________________________________________________End of function
+
+///init object structs
+void initObjectPaths() {
+	creeper.name = "Creeper";
+	creeper.objectPath = "Media\\Objects\\Creeper-obj\\Creeper.obj";
+	creeper.mtlPath = "Media\\Objects\\Creeper-obj\\Creeper.mtl";
+	creeper.basePath = "Media\\Objects\\Creeper-obj\\";
+
+	boat.name = "Boat";
+	boat.objectPath = "Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.obj";
+	boat.mtlPath = "Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.mtl";
+	boat.basePath = "Media\\Objects\\LowPolyBoat-obj\\";
+
+	pouf.name = "Pouf";
+	pouf.objectPath = "Media\\Objects\\Pouf-obj\\Pouf.obj";
+	pouf.mtlPath = "Media\\Objects\\Pouf-obj\\Pouf.mtl";
+	pouf.basePath = "Media\\Objects\\Pouf-obj\\";
+
+	custom.name = "Custom";
+	custom.objectPath = "Media\\Objects\\Custom-obj\\Custom.obj";
+	custom.mtlPath = "Media\\Objects\\Custom-obj\\Custom.mtl";
+	custom.basePath = "Media\\Objects\\Custom-obj\\";
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -187,11 +223,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		wireframe = !wireframe;
 		wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);;
 	}
-	if (key == GLFW_KEY_3 && action == GLFW_RELEASE) {
+	if (key == GLFW_KEY_3 && action == GLFW_RELEASE)
 		lightFollow = !lightFollow;
-	}
 	if (key == GLFW_KEY_4 && action == GLFW_RELEASE && objects.size() > 3) //only allow to go down to 3
 		objects.pop_back();
+	if (key == GLFW_KEY_5 && action == GLFW_RELEASE){
+		for (int i = 0; i < objects.size(); i++) {
+		objects.at(i).swapTexture();
+		}
+	}
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -246,6 +286,7 @@ int windowInit(GLFWwindow* window) {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetKeyCallback(window, key_callback);
 	glewInit(); // initialise glew componenets
+	return 0;
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -263,21 +304,67 @@ void loadObjects(const char * objPath, const char * mtlPath) {
 }
 ///_________________________________________________________________________________________________End of function
 
+///take input from user on what additional objects to load.
+void chooseObjects() {
+	if (objects.size() == 8) {
+		cout << "MAXIMUM OBJECTS REACHED!!" << endl << endl;
+		return;
+	}
+
+	cout << "Would you like to Select Another Object to Render?" << endl;
+	cout << "Please enter 'Exit' for No, otherwise select an object below to render..." << endl << endl;
+	string x;
+
+		cout << "Please select by typing either 'Creeper' : 'Boat' : 'Pouf' : 'Custom' " << endl << endl;
+		cin >> x;
+		cout << endl;
+		if (x == creeper.name) {
+			loadObjects(creeper.objectPath, creeper.mtlPath);
+			chooseObjects();
+		} 
+		else if (x == boat.name) {
+			loadObjects(boat.objectPath, boat.mtlPath);
+			chooseObjects();
+		}
+		else if (x == pouf.name) {
+			loadObjects(pouf.objectPath, pouf.mtlPath);
+			chooseObjects();
+		}
+		else if (x == custom.name) {
+			loadObjects(custom.objectPath, custom.mtlPath);
+			chooseObjects();
+		}
+		else if (x == "Exit") {
+			return; //do nothing
+		}
+		else {
+			cout << "INVALID SELECTION: CHECK CASE?" << endl << endl;
+			chooseObjects();
+		}
+}
+
+
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
 
 	init();
+	initObjectPaths();
 
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
-	loadObjects("Media\\Objects\\Creeper-obj\\Creeper.obj", "Media\\Objects\\Creeper-obj\\Creeper.mtl");
-	loadObjects("Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.obj","Media\\Objects\\LowPolyBoat-obj\\Low_Poly_Boat.mtl");
-	loadObjects("Media\\Objects\\pouf-obj\\pouf.obj", "Media\\Objects\\pouf-obj\\pouf.mtl");
-	loadObjects("Media\\Objects\\Custom-obj\\Custom.obj", "Media\\Objects\\Custom-obj\\Custom.mtl");
+	//load default objects
+	loadObjects(creeper.objectPath, creeper.mtlPath);
+	loadObjects(boat.objectPath, boat.mtlPath);
+	loadObjects(pouf.objectPath, pouf.mtlPath);
+	loadObjects(custom.objectPath, custom.mtlPath);
+	//load any additional objects?
+	chooseObjects();
+
+
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
@@ -311,7 +398,7 @@ int main() {
 		objectShaders.run();
 		objectShaders.setVec3("viewPosition", camera.cameraPos);
 		objectShaders.setVec3("lightPos", lightPosition);	
-		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 300.0f);
+		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
 		objectShaders.setMat4("projection", projectionMatrix);

@@ -29,7 +29,7 @@ void Mesh::setupMesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
-	
+
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	//vertex coordinates offsets and locations
@@ -48,12 +48,15 @@ void Mesh::setupMesh() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, object.size() * sizeof(float), &object[0], GL_STATIC_DRAW);
+	setupTexture();
+}
 
-
+void Mesh::setupTexture(){
 	///REALLY MESSY NEED TO FIX TEXTURES
 	const char * texturePath;
 	texturePath = "Media\\Image.png";
 	if (hasTexture == true) {
+		//default to creeper if object has texture;
 		texturePath = "Media\\Objects\\Creeper-obj\\Texture.png";
 	}
 
@@ -73,6 +76,12 @@ void Mesh::setupMesh() {
 	//same for the generation of mipMaps
 	glGenerateMipmap(GL_TEXTURE_2D);
 	stbi_image_free(textureData); // clear up the data now we dont need it
+}
+
+void Mesh::swapTexture() {
+	hasTexture = !hasTexture;
+	glDeleteTextures(0, &texture);
+	setupTexture();
 }
 
 #ifdef __cplusplus

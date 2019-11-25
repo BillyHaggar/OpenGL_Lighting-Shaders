@@ -21,6 +21,8 @@ class Mesh
 public:
 	Mesh(std::vector<float> object, std::vector<int> indices, bool hasTexture);
 	void setupMesh();
+	void setupTexture();
+	void swapTexture();
 	unsigned int VBO, VAO, EBO;
 	std::vector<float> object;
 	std::vector<int> indices;
