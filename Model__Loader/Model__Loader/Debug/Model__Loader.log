@@ -1,4 +1,7 @@
-﻿  main.cpp
+﻿  Loader.cpp
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(87): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(139): warning C4018: '<': signed/unsigned mismatch
+  main.cpp
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(46): warning C4305: 'initializing': truncation from 'double' to 'float'
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(169): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(170): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
@@ -8,8 +11,9 @@ c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loade
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(186): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(187): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(188): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(231): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(389): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(410): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(448): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(232): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(392): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(413): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(451): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Debug\Model__Loader.exe

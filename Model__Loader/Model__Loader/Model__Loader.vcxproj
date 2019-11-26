@@ -131,9 +131,11 @@
     <ClCompile Include="Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Creeper-obj\Creeper.mtl" />
     <None Include="Media\Objects\Custom-obj\Custom.mtl" />
     <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
+    <None Include="Media\Objects\low_poly_boat.dae" />
     <None Include="Media\Objects\Pouf-obj\pouf.mtl" />
     <None Include="Media\Shaders\lightFragment.fs" />
     <None Include="Media\Shaders\lightVertex.vs" />

@@ -19,7 +19,7 @@ using namespace std;
 class Mesh
 {
 public:
-	Mesh(std::vector<float> object, std::vector<int> indices, bool hasTexture);
+	Mesh(std::vector<float> object, std::vector<int> indices, bool hasTexture, float scale);
 	void setupMesh();
 	void setupTexture();
 	void swapTexture();
@@ -27,6 +27,7 @@ public:
 	std::vector<float> object;
 	std::vector<int> indices;
 	bool hasTexture;
+	float scale;
 
 	///Textures______________________________________________________
 	unsigned int texture;

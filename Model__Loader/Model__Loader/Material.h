@@ -24,7 +24,7 @@ public:
 	string materialName;
 	float Ns;
 	glm::vec3 Ka;
-	glm::vec3 Kd;
+	glm::vec3 Kd = glm::vec3(1.0f); // default colour white
 	glm::vec3 Ks;
 	glm::vec3 Ke;
 	float Ni;

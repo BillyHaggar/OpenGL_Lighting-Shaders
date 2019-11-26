@@ -18,10 +18,11 @@ extern "C" {
 
 	using namespace std;
 
-Mesh::Mesh(std::vector<float> object, std::vector<int> indices, bool hasTexture){
+Mesh::Mesh(std::vector<float> object, std::vector<int> indices, bool hasTexture, float scale){
 	this->object = object;
 	this->indices = indices;
 	this->hasTexture = hasTexture;
+	this->scale = scale;
 	setupMesh();
 }
 

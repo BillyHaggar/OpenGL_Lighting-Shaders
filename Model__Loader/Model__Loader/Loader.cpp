@@ -13,6 +13,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <regex>
 
 
 #ifdef __cplusplus
@@ -284,6 +285,75 @@ extern "C" {
 		return true;
 	}
 	///_________________________________________________________________________________________________End of Function
+
+	///Load loadDAE
+	void Loader::loadDAE(const char * filePath) {
+		cout << "Loading: " << filePath << endl;
+
+		string line;
+		ifstream fileRead(filePath);
+		Material tempMaterial;
+		std::vector<Material> materials;
+
+		string vertexLine;
+		string normalLine;
+		string textureLine;
+		string faceLine;
+		string materialLine;
+		string colorLine;
+
+		regex floatPositionReg("\\s*<float_array.*positions.*");
+		regex floatNormalReg("\\s*<float_array.*normals.*");
+		regex floatTextureReg("\\s*<float_array.*map.*");
+		regex floatFaceReg("\\s*<p>.*");
+		regex materialNameReg("\\s*<\\s*effect.*>");
+		string q = "\"";
+		regex floatColorReg("\\s*<\\s*color.*sid=" + q + "diffuse" + q + ".*>");
+		smatch m;
+		bool read = false;
+
+		if (fileRead.is_open()) {
+			while (getline(fileRead, line)) {
+				//if line contains the start of whats needed
+				if (regex_search(line, m, floatPositionReg) == true) {
+					vertexLine = line;
+					vertexLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) -1);
+					cout << vertexLine << endl; //make this push back
+				}
+				else if (regex_search(line, m, floatNormalReg) == true) {
+					normalLine = line;
+					normalLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
+					cout << normalLine << endl; // make these push back
+				}
+				else if (regex_search(line, m, floatTextureReg) == true) {
+					textureLine = line;
+					textureLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
+					cout << textureLine << endl; // make these push back
+				}
+				else if (regex_search(line, m, floatFaceReg) == true) {
+					faceLine = line;
+					faceLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
+					cout << faceLine << endl; // make these push back
+				}
+				else if (regex_search(line, m, materialNameReg) == true) {
+					materialLine = line;
+					materialLine = line.substr((line.find("\"") + 1), line.find(">") - (line.find("\"")) - 2);
+					tempMaterial.materialName = materialLine;
+					cout << materialLine << endl; // make these push back
+				}
+				else if (regex_search(line, m, floatColorReg) == true) {
+					colorLine = line;
+					colorLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
+					cout << colorLine << endl; // make these push back
+				}
+				// add else if for end of material/effect and then push it back, then all materials will be stored;
+			}
+			fileRead.close();
+		}
+		
+	}
+	///_________________________________________________________________________________________________End of Function
+
 #ifdef __cplusplus
 };
 #endif // __cplusplus

@@ -44,6 +44,8 @@
     <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
     <None Include="Media\Objects\Custom-obj\Custom.mtl" />
     <None Include="Media\Objects\Creeper-obj\Creeper.mtl" />
+    <None Include="Media\Objects\low_poly_boat.dae" />
+    <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">

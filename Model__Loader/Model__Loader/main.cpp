@@ -225,8 +225,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_RELEASE)
 		lightFollow = !lightFollow;
-	if (key == GLFW_KEY_4 && action == GLFW_RELEASE && objects.size() > 3) //only allow to go down to 3
-		objects.pop_back();
+	if (key == GLFW_KEY_4 && action == GLFW_RELEASE && objects.size() > 3) { //only allow to go down to 3
+		objects.erase(objects.begin() + (objects.size() - 1)); // better than pop back, will clear the allocated memory too!
+	}
 	if (key == GLFW_KEY_5 && action == GLFW_RELEASE){
 		for (int i = 0; i < objects.size(); i++) {
 		objects.at(i).swapTexture();
@@ -291,7 +292,7 @@ int windowInit(GLFWwindow* window) {
 ///_________________________________________________________________________________________________End of function
 
 /// load an obj object, call all functions and create the mesh needed to run the object
-void loadObjects(const char * objPath, const char * mtlPath) {
+void loadObjects(const char * objPath, const char * mtlPath, float scale) {
 	Loader loaderTemp;
 	std::vector <float> objectTemp;
 	std::vector <int> indicesTemp;
@@ -299,7 +300,7 @@ void loadObjects(const char * objPath, const char * mtlPath) {
 	loaderTemp.loadOBJ(objPath);
 	loaderTemp.loadMTL(mtlPath, materialsTemp);
 	loaderTemp.objectBuilder(objectTemp, indicesTemp, materialsTemp);
-	Mesh tempMesh(objectTemp, indicesTemp, loaderTemp.hasTexture);
+	Mesh tempMesh(objectTemp, indicesTemp, loaderTemp.hasTexture, scale);
 	objects.push_back(tempMesh);
 }
 ///_________________________________________________________________________________________________End of function
@@ -319,19 +320,19 @@ void chooseObjects() {
 		cin >> x;
 		cout << endl;
 		if (x == creeper.name) {
-			loadObjects(creeper.objectPath, creeper.mtlPath);
+			loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
 			chooseObjects();
 		} 
 		else if (x == boat.name) {
-			loadObjects(boat.objectPath, boat.mtlPath);
+			loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
 			chooseObjects();
 		}
 		else if (x == pouf.name) {
-			loadObjects(pouf.objectPath, pouf.mtlPath);
+			loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
 			chooseObjects();
 		}
 		else if (x == custom.name) {
-			loadObjects(custom.objectPath, custom.mtlPath);
+			loadObjects(custom.objectPath, custom.mtlPath, 0.3f);
 			chooseObjects();
 		}
 		else if (x == "Exit") {
@@ -357,13 +358,17 @@ int main() {
 	windowInit(window);
 
 	//load default objects
-	loadObjects(creeper.objectPath, creeper.mtlPath);
-	loadObjects(boat.objectPath, boat.mtlPath);
-	loadObjects(pouf.objectPath, pouf.mtlPath);
-	loadObjects(custom.objectPath, custom.mtlPath);
+	//loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
+	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
+	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
+	
 	//load any additional objects?
-	chooseObjects();
-
+	//chooseObjects();
+	Loader tempLoader;
+	tempLoader.loadDAE("Media\\Objects\\Creeper-dae\\Creeper.dae");
+	string x;
+	cin >> x;
 
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
@@ -412,7 +417,7 @@ int main() {
 			//change the model matrix for each object
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(objectScales[i]));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(i).scale));
 			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 			objectShaders.setMat4("model", modelMatrix);
 

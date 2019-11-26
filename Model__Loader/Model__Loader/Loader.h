@@ -26,6 +26,7 @@ extern "C" {
 		bool loadMTL(const char* filePath, std::vector<Material> &vector);
 		bool faceSplitter(string word);
 		void objectBuilder(std::vector <float> &object, std::vector <int> &indices, std::vector<Material> materials);
+		void loadDAE(const char * filePath);
 
 
 		//temp loaded object data
