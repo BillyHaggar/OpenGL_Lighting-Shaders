@@ -305,9 +305,10 @@ void loadObjects(const char * objPath, const char * mtlPath, float scale) {
 }
 ///_________________________________________________________________________________________________End of function
 
+
 ///take input from user on what additional objects to load.
 void chooseObjects() {
-	if (objects.size() == 8) {
+	if (objects.size() >= 7) {
 		cout << "MAXIMUM OBJECTS REACHED!!" << endl << endl;
 		return;
 	}
@@ -358,17 +359,19 @@ int main() {
 	windowInit(window);
 
 	//load default objects
-	//loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
-	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
-	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
-	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
+	loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+	loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
+	loadObjects(custom.objectPath, custom.mtlPath, 0.3);
 	
 	//load any additional objects?
-	//chooseObjects();
+	chooseObjects();
 	Loader tempLoader;
-	tempLoader.loadDAE("Media\\Objects\\Creeper-dae\\Creeper.dae");
-	string x;
-	cin >> x;
+	std::vector <float> objectTempDAE;
+	std::vector <int> indicesTempDAE;
+	tempLoader.loadDAE("Media\\Objects\\Low_poly_boat.dae", objectTempDAE, indicesTempDAE);
+	Mesh tempMesh(objectTempDAE, indicesTempDAE, tempLoader.hasTexture, 0.3f);
+	objects.push_back(tempMesh);
 
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader

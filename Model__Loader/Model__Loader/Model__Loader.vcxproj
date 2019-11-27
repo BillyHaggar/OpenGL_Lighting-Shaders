@@ -137,6 +137,7 @@
     <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
     <None Include="Media\Objects\low_poly_boat.dae" />
     <None Include="Media\Objects\Pouf-obj\pouf.mtl" />
+    <None Include="Media\Objects\Pouf.dae" />
     <None Include="Media\Shaders\lightFragment.fs" />
     <None Include="Media\Shaders\lightVertex.vs" />
     <None Include="Media\Shaders\mainFragment.fs" />

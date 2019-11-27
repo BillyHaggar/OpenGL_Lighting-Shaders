@@ -287,7 +287,7 @@ extern "C" {
 	///_________________________________________________________________________________________________End of Function
 
 	///Load loadDAE
-	void Loader::loadDAE(const char * filePath) {
+	void Loader::loadDAE(const char * filePath, std::vector <float> &object, std::vector <int> &indices) {
 		cout << "Loading: " << filePath << endl;
 
 		string line;
@@ -301,14 +301,21 @@ extern "C" {
 		string faceLine;
 		string materialLine;
 		string colorLine;
+		glm::vec3 defaultTexCood(1.0f);
+		glm::vec3 color(1.0f);
+		int i = 0;
 
 		regex floatPositionReg("\\s*<float_array.*positions.*");
 		regex floatNormalReg("\\s*<float_array.*normals.*");
 		regex floatTextureReg("\\s*<float_array.*map.*");
 		regex floatFaceReg("\\s*<p>.*");
 		regex materialNameReg("\\s*<\\s*effect.*>");
+		regex materialEndReg("\\s*</\\s*effect\\s*>");
 		string q = "\"";
 		regex floatColorReg("\\s*<\\s*color.*sid=" + q + "diffuse" + q + ".*>");
+		regex textureReg("\s*<init_from>.*\.png.*");
+		regex endOfMeshReg("\\s*</\\s*mesh\\s*>");
+		regex materialSetReg("\\s*<\\s*triangles\\s*.*");
 		smatch m;
 		bool read = false;
 
@@ -318,35 +325,103 @@ extern "C" {
 				if (regex_search(line, m, floatPositionReg) == true) {
 					vertexLine = line;
 					vertexLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) -1);
-					cout << vertexLine << endl; //make this push back
+					stringstream ss(vertexLine);
+					float x, y, z;
+					while (ss >> x >> y >> z) {
+						tempVertice.x = x;
+						tempVertice.y = y;
+						tempVertice.z = z;
+						vertices.push_back(tempVertice);
+					}
+					
 				}
 				else if (regex_search(line, m, floatNormalReg) == true) {
 					normalLine = line;
 					normalLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
-					cout << normalLine << endl; // make these push back
+					stringstream ss(normalLine);
+					float x, y, z;
+					while (ss >> x >> y >> z) {
+						tempNormal.x = x;
+						tempNormal.y = y;
+						tempNormal.z = z;
+						normals.push_back(tempNormal);
+					}
 				}
 				else if (regex_search(line, m, floatTextureReg) == true) {
 					textureLine = line;
 					textureLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
-					cout << textureLine << endl; // make these push back
+					stringstream ss(textureLine);
+					float x, y, z;
+					while (ss >> x >> y) {
+						tempTexCoord.x = x;
+						tempTexCoord.y = y;
+						textureCoords.push_back(tempTexCoord);
+					}
 				}
 				else if (regex_search(line, m, floatFaceReg) == true) {
 					faceLine = line;
 					faceLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
-					cout << faceLine << endl; // make these push back
+					stringstream ss(faceLine);
+					int x, y, z;
+					
+					while (ss >> x >> y >> z) {
+						object.push_back(vertices.at(x).x);
+						object.push_back(vertices.at(x).y);
+						object.push_back(vertices.at(x).z);
+
+						object.push_back(normals.at(y).x);
+						object.push_back(normals.at(y).y);
+						object.push_back(normals.at(y).z);
+						
+						object.push_back(textureCoords.at(z).x);
+						object.push_back(textureCoords.at(z).y);
+
+						object.push_back(color.x);
+						object.push_back(color.y);
+						object.push_back(color.z);
+
+						indices.push_back(i);
+						i++;
+					}
+						
 				}
 				else if (regex_search(line, m, materialNameReg) == true) {
 					materialLine = line;
-					materialLine = line.substr((line.find("\"") + 1), line.find(">") - (line.find("\"")) - 2);
+					materialLine = line.substr((line.find("\"") + 1), line.find(">") - (line.find("\"")) - 9);
 					tempMaterial.materialName = materialLine;
-					cout << materialLine << endl; // make these push back
 				}
 				else if (regex_search(line, m, floatColorReg) == true) {
 					colorLine = line;
 					colorLine = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);
-					cout << colorLine << endl; // make these push back
+					stringstream ss(colorLine);
+					ss >> color.x >> color.y >> color.z;
+					tempMaterial.Kd = color;
 				}
-				// add else if for end of material/effect and then push it back, then all materials will be stored;
+				else if (regex_search(line, m, materialEndReg) == true) {
+					materials.push_back(tempMaterial);
+				}
+				else if (regex_search(line, m, textureReg) == true) {
+					hasTexture = true;
+					string textureAddress;
+					textureAddress = line.substr((line.find(">") + 1), line.find("</") - (line.find(">")) - 1);;
+					for (int j = 0; j < materials.size(); j++) {
+						materials.at(j).map_Kd = textureAddress;
+					}
+				}
+				else if (regex_search(line, m, endOfMeshReg) == true) {
+					vertices.erase(vertices.begin(), vertices.end());
+					textureCoords.erase(textureCoords.begin(), textureCoords.end());
+					normals.erase(normals.begin(), normals.end());
+				}
+				else if (regex_search(line, m, materialSetReg) == true) {
+					materialLine = line;
+					materialLine = line.substr((line.find("\"") + 1), line.find("\" count") - (line.find("\"")) - 10);
+					for (int j = 0; j < materials.size(); j++) {
+						if (materials.at(j).materialName == materialLine) {
+							color = materials.at(j).Kd;
+						}
+					}
+				}
 			}
 			fileRead.close();
 		}
