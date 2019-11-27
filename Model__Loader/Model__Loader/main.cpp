@@ -305,6 +305,17 @@ void loadObjects(const char * objPath, const char * mtlPath, float scale) {
 }
 ///_________________________________________________________________________________________________End of function
 
+///Load Dae Object
+void loadObjectsDAE(const char * daePath, float scale) {
+	Loader tempLoader;
+	std::vector <float> objectTempDAE;
+	std::vector <int> indicesTempDAE;
+	tempLoader.loadDAE(daePath, objectTempDAE, indicesTempDAE);
+	Mesh tempMesh(objectTempDAE, indicesTempDAE, tempLoader.hasTexture, scale);
+	objects.push_back(tempMesh);
+}
+///_________________________________________________________________________________________________End of function
+
 
 ///take input from user on what additional objects to load.
 void chooseObjects() {
@@ -366,13 +377,8 @@ int main() {
 	
 	//load any additional objects?
 	chooseObjects();
-	Loader tempLoader;
-	std::vector <float> objectTempDAE;
-	std::vector <int> indicesTempDAE;
-	tempLoader.loadDAE("Media\\Objects\\Low_poly_boat.dae", objectTempDAE, indicesTempDAE);
-	Mesh tempMesh(objectTempDAE, indicesTempDAE, tempLoader.hasTexture, 0.3f);
-	objects.push_back(tempMesh);
-
+	
+	loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");

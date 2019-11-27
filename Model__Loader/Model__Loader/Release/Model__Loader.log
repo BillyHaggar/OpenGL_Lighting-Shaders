@@ -9,12 +9,12 @@ c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loade
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(187): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(188): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(232): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(365): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(395): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(416): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(454): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(376): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(401): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(422): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(460): warning C4018: '<': signed/unsigned mismatch
   Generating code
-  2 of 1861 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  3 of 1862 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
