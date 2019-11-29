@@ -40,10 +40,7 @@ glm::vec3 objectPositions[8] = {
   glm::vec3(490.0f, 0.0f, 0.0f),
 };
 
-///scale of objects
-float objectScales[8]{
-	40.0, 0.3, 60.0, 0.3, 0.3, 0.3, 0.3, 0.3
-};
+
 
 ///light data_________________________________________________
 float lightCube[36*3] = {

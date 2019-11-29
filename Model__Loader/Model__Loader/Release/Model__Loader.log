@@ -1,21 +1,30 @@
-﻿  main.cpp
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(46): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(169): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(170): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(180): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(181): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(185): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(186): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(187): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(188): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(232): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(376): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(401): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(422): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(460): warning C4018: '<': signed/unsigned mismatch
+﻿  backup.cpp
+  Camera.cpp
+  Loader.cpp
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(87): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(139): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(316): warning C4129: 's': unrecognized character escape sequence
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(316): warning C4129: '.': unrecognized character escape sequence
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(407): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(419): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\loader.cpp(354): warning C4101: 'z': unreferenced local variable
+  main.cpp
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(166): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(167): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(177): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(178): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(182): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(183): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(184): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(185): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(229): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(373): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(398): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(419): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\s356-bhaggar\model__loader\model__loader\main.cpp(457): warning C4018: '<': signed/unsigned mismatch
+  Material.cpp
+  Mesh.cpp
   Generating code
-  3 of 1862 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  All 1862 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\S356-bhaggar\Model__Loader\Release\Model__Loader.exe

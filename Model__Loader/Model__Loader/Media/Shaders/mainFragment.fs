@@ -44,5 +44,5 @@ void main(){
 	vec3 result = (ambientLight + diffuse + specular) * inColor;
 
 
-	FragColor = texture(texture, inTexture) * vec4(result, material.d);
+	FragColor = texture(texture, inTexture) * vec4(result, 1.0);
 }
