@@ -5,9 +5,7 @@ This is all about the `MODEL LOADER`
 
 ## How to Run
 
-- Put the deets here
-- move them legs really fast
-- one in front of the other
+- run in release mode in vs 2017 toolset v141
 
 
 ## Current Functionality
