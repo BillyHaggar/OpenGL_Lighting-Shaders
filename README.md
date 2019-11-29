@@ -6,6 +6,8 @@ This is all about the `MODEL LOADER`
 ## How to Run
 
 - run in release mode in vs 2017 toolset v141
+- must be release in order for Regex to run at an appropriate speed
+
 
 
 ## Current Functionality
@@ -15,7 +17,8 @@ This is all about the `MODEL LOADER`
  - lighting implemented
  - Camera implemented
  - Meshes implemented
- - ADD TO THIS AND MAKE IT MORE INDEPTH
+ - Dae files can be loaded
+ - 
 
 ## CONTROLS
 ###### Camera 
@@ -34,10 +37,10 @@ A key
 D key
 - straife right
 
-Left Shift key
+space key
 - move camera up on z axis (increase height)
 
-Left Control key
+Left Shift key
 - move camera down on z axis (decrease height)
 
 ###### Enable Features
@@ -53,13 +56,15 @@ Left Control key
 4 key
 - Remove object from being rendered (Will remove objects in reverse loaded order down to a minimum of 3 objects)
 
+5 Key 
+- Swap textures on all objects
 
 ## Development Process
 #### Beginnings 
- When starting development... 
+ When starting development heavy use of LearnOpenGL code was used, then at later stages such as the parser, independant c++ knowledge was used as well as research into each of the file types.
 
 #### Main Development
- Later in development after the main set up for rendering was achieved...
+ Later in development after the main set up for rendering was achieved more advanced features were implemented, these features were items such as lighting, DAE implemntation, multiple objects loaded as well as removing these objects.
 
 #### Later Features
- Some later features can be added, these are...
+ Some later features can be added, these are hit box detection, advanced lighting such as bloom as well as a better way for the console to load in objects.
