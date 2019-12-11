@@ -31,13 +31,13 @@ unsigned int light_VAO, light_VBO;
 ///object origin posistions
 glm::vec3 objectPositions[8] = {
   glm::vec3(0.0f,  -30.0f,  0.0f),
-  glm::vec3(70.0f,  0.0f, 70.0f),
-  glm::vec3(140.f, 0.0f, 10.0f),
-  glm::vec3(210.0f, 0.0f, 10.0f),
-  glm::vec3(280.0f, 0.0f, 10.0f),
-  glm::vec3(350.0f, 0.0f, 10.0f),
-  glm::vec3(420.0f, 0.0f, 10.0f),
-  glm::vec3(490.0f, 0.0f, 10.0f),
+  glm::vec3(100.0f,  25.0f, -70.0f),
+  glm::vec3(215.0f, 40.0f, -150.0f),
+  glm::vec3(240.0f, 10.0f, -100.0f),
+  glm::vec3(170.0f, 35.0f, -175.0f),
+  glm::vec3(130.0f, 50.0f, -40.0f),
+  glm::vec3(80.0f, 15.0f, -240.0f),
+  glm::vec3(280.0f, 64.0f, -25.0f),
 };
 
 ///light data_________________________________________________
@@ -371,12 +371,16 @@ int main() {
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
 	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
 	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
 	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
 	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
 	
-	//load any additional objects?
 	//chooseObjects();
 	
 	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
@@ -428,7 +432,7 @@ int main() {
 			for (int x = 0; x < 10; x++) {
 				//change the model matrix for each object
 				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (40.0f * y))));
+				modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (-40.0f * y))));
 				modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(0).scale));
 				objectShaders.setMat4("model", modelMatrix);
 
@@ -445,7 +449,8 @@ int main() {
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(i).scale));
-			modelMatrix = glm::rotate(modelMatrix, /*(float)glfwGetTime()/4*/glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+			float angle = 20.0f * i;
+			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			objectShaders.setMat4("model", modelMatrix);
 
 			glActiveTexture(GL_TEXTURE0);
