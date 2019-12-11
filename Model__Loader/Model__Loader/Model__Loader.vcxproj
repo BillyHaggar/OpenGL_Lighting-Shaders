@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -134,6 +134,7 @@
     <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Creeper-obj\Creeper.mtl" />
     <None Include="Media\Objects\Custom-obj\Custom.mtl" />
+    <None Include="Media\Objects\Grid-obj\Grid.mtl" />
     <None Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.mtl" />
     <None Include="Media\Objects\low_poly_boat.dae" />
     <None Include="Media\Objects\Pouf-obj\pouf.mtl" />
@@ -163,8 +164,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Media\Grid.png" />
     <Image Include="Media\Image.png" />
     <Image Include="Media\Objects\Creeper-obj\Texture.png" />
+    <Image Include="Media\Objects\Grid-obj\Texture.png" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Media\Objects\Creeper-obj\Creeper.obj">
@@ -174,6 +177,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </Object>
     <Object Include="Media\Objects\Custom-obj\Custom.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Media\Objects\Grid-obj\Grid.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

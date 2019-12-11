@@ -30,17 +30,15 @@ unsigned int light_VAO, light_VBO;
 
 ///object origin posistions
 glm::vec3 objectPositions[8] = {
-  glm::vec3(0.0f,  0.0f,  0.0f),
-  glm::vec3(70.0f,  0.0f, 0.0f),
-  glm::vec3(140.f, 0.0f, 0.0f),
-  glm::vec3(210.0f, 0.0f, 0.0f),
-  glm::vec3(280.0f, 0.0f, 0.0f),
-  glm::vec3(350.0f, 0.0f, 0.0f),
-  glm::vec3(420.0f, 0.0f, 0.0f),
-  glm::vec3(490.0f, 0.0f, 0.0f),
+  glm::vec3(0.0f,  -30.0f,  0.0f),
+  glm::vec3(70.0f,  0.0f, 70.0f),
+  glm::vec3(140.f, 0.0f, 10.0f),
+  glm::vec3(210.0f, 0.0f, 10.0f),
+  glm::vec3(280.0f, 0.0f, 10.0f),
+  glm::vec3(350.0f, 0.0f, 10.0f),
+  glm::vec3(420.0f, 0.0f, 10.0f),
+  glm::vec3(490.0f, 0.0f, 10.0f),
 };
-
-
 
 ///light data_________________________________________________
 float lightCube[36*3] = {
@@ -94,7 +92,7 @@ struct objectPaths {
 	const char * objectPath;
 	const char * mtlPath;
 	const char * basePath;
-}creeper, boat, pouf, custom;
+}creeper, boat, pouf, custom, grid;
 
 
 ///other variables ____________________________________________________
@@ -107,7 +105,6 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
-
 ///OpenGl packages all initialisations
 void init() {
 	//intialise the required GLFW things
@@ -140,6 +137,11 @@ void initObjectPaths() {
 	custom.objectPath = "Media\\Objects\\Custom-obj\\Custom.obj";
 	custom.mtlPath = "Media\\Objects\\Custom-obj\\Custom.mtl";
 	custom.basePath = "Media\\Objects\\Custom-obj\\";
+
+	grid.name = "Grid";
+	grid.objectPath = "Media\\Objects\\Grid-obj\\Grid.obj";
+	grid.mtlPath = "Media\\Objects\\Grid-obj\\Grid.mtl";
+	grid.basePath = "Media\\Objects\\Grid-obj\\";
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -367,15 +369,17 @@ int main() {
 	windowInit(window);
 
 	//load default objects
-	loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
-	loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
-	loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
-	loadObjects(custom.objectPath, custom.mtlPath, 0.3);
+	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
+	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+
+	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
+	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
 	
 	//load any additional objects?
-	chooseObjects();
+	//chooseObjects();
 	
-	loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
+	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
@@ -386,7 +390,7 @@ int main() {
 	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	objectShaders.setInt("texture", 0);
 	objectShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	objectShaders.setFloat("ambientLight", 0.3f);
+	objectShaders.setFloat("ambientLight", 0.2f);
 	setMTL(objectShaders, material);
 
 	glfwShowWindow(window);
@@ -415,8 +419,25 @@ int main() {
 		objectShaders.setMat4("projection", projectionMatrix);
 		objectShaders.setMat4("view", viewMatrix);
 
+		//draw grid
+		glBindVertexArray(objects.at(0).VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, objects.at(0).VBO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, objects.at(0).texture);
+		for (int y = 0; y < 10; y++) {
+			for (int x = 0; x < 10; x++) {
+				//change the model matrix for each object
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (40.0f * y))));
+				modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(0).scale));
+				objectShaders.setMat4("model", modelMatrix);
+
+				glDrawElements(GL_TRIANGLES, objects.at(0).indices.size(), GL_UNSIGNED_INT, 0);
+			}
+		}
+
 		//repeate for abount of objects
-		for (int i = 0; i < objects.size(); i++) {
+		for (int i = 1; i < objects.size(); i++) {
 			glBindVertexArray(objects.at(i).VAO);
 			glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
 
@@ -432,6 +453,8 @@ int main() {
 
 			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
+
+
 		
 		if (!lightFollow) {
 			//draw the light cube when not following camera, else move light with camera

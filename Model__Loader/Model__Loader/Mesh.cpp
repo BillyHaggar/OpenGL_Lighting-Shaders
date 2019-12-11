@@ -58,7 +58,7 @@ void Mesh::setupTexture(){
 	texturePath = "Media\\Image.png";
 	if (hasTexture == true) {
 		//default to creeper if object has texture;
-		texturePath = "Media\\Objects\\Creeper-obj\\Texture.png";
+		texturePath = "Media\\Objects\\Grid-obj\\Texture.png";
 	}
 
 	// set the texture wrapping parameters
