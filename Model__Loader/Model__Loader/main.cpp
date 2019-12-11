@@ -452,7 +452,6 @@ int main() {
 			float angle = 20.0f * i;
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			objectShaders.setMat4("model", modelMatrix);
-
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, objects.at(i).texture);
 
