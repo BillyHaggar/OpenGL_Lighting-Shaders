@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+///imgui header files
+#include "Media/Imgui/imgui.h"
+#include "Media/Imgui/imgui_impl_glfw_gl3.h"
 ///own header files
 #include "Shader.h"
 #include "Camera.h"
@@ -103,6 +106,8 @@ float lastY = windowHeight / 2;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
+
+///ImGUI variables
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 ///OpenGl packages all initialisations
@@ -209,7 +214,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 ///_________________________________________________________________________________________________End of function
 
 bool wireframe = false;
-bool mouse = false;
+bool mouse = true;
 bool lightFollow = false;
 ///Key callback for keypresses we dont want to be repeated
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -282,10 +287,16 @@ int windowInit(GLFWwindow* window) {
 	}
 	glfwMakeContextCurrent(window); //target window of open gl we created
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetKeyCallback(window, key_callback);
 	glewInit(); // initialise glew componenets
+
+	//init GUI
+	ImGui::CreateContext();
+	ImGui_ImplGlfwGL3_Init(window, true);
+	ImGui::StyleColorsDark();
+
 	return 0;
 }
 ///_________________________________________________________________________________________________End of function
@@ -314,7 +325,6 @@ void loadObjectsDAE(const char * daePath, float scale) {
 	objects.push_back(tempMesh);
 }
 ///_________________________________________________________________________________________________End of function
-
 
 ///take input from user on what additional objects to load.
 void chooseObjects() {
@@ -360,7 +370,6 @@ void chooseObjects() {
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
-
 	init();
 	initObjectPaths();
 
@@ -370,13 +379,9 @@ int main() {
 
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
-	loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	for (int o = 0; o < 7; o++) {
+		loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
+	}
 	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
 	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
 	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
@@ -400,8 +405,15 @@ int main() {
 	glfwShowWindow(window);
 
 	glEnable(GL_DEPTH_TEST);
+
+	bool show_demo_window = true;
+	bool show_another_window = false;
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
+		ImGui_ImplGlfwGL3_NewFrame();//create a new frame for GUI
+		
 		//calulate time between frames
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -476,6 +488,30 @@ int main() {
 		else {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
+
+
+
+		static int counter = 0;
+		ImGui::Text("Edit Lighting in this here window!!\n");
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
+		ImGui::Checkbox("Another Window", &show_another_window);
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+
+		//draw the GUI
+		ImGui::Render();
+		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+
+
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
 	}
@@ -490,6 +526,8 @@ int main() {
 	glDeleteBuffers(1, &light_VBO);
 
 	//clean up and close down correctly
+	ImGui_ImplGlfwGL3_Shutdown();
+	ImGui::DestroyContext();
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;//return 0, exited normally
