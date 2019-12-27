@@ -86,6 +86,9 @@ glm::vec3 lightPosition(100.0, 35.0, 110.0);
 
 ///object creators_______________________________________________
 Camera camera;
+bool wireframe = false;
+bool mouse = false;
+bool lightFollow = false;
 Material material;
 Loader loader;
 std::vector<Mesh> objects;
@@ -108,6 +111,13 @@ float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
 ///ImGUI variables
+bool showMainWindow = true;
+bool showCameraWindow = false;
+bool showFeaturesWindow = true;
+static glm::vec3 lightColor(1.0f);
+static float ambientLight = 0.2f;
+static float cameraSpeedMultiplier = 1.0f;
+static float mouseSensitivity = 1.0f;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 ///OpenGl packages all initialisations
@@ -177,50 +187,49 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 ///Mouse callback hander function
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	if (mouse) {
+		//stop mouse jumping around when first detecting mouse
+		if (camera.firstMouse)
+		{
+			lastX = xpos;
+			lastY = ypos;
+			camera.firstMouse = false;
+		}
 
-	//stop mouse jumping around when first detecting mouse
-	if (camera.firstMouse)
-	{
+		float xOffset = xpos - lastX;
+		float yOffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
 		lastX = xpos;
 		lastY = ypos;
-		camera.firstMouse = false;
+
+		float sensitivity = 0.09f * mouseSensitivity;
+		xOffset *= sensitivity;
+		yOffset *= sensitivity;
+
+		camera.yaw += xOffset;
+		camera.pitch += yOffset;
+
+		//stop the mouse looping round the z axis, can only go as high as the sky and the floor
+		if (camera.pitch < -89.0f)
+			camera.pitch = -89.0;
+		if (camera.pitch > 89.0f)
+			camera.pitch = 89.0f;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(camera.pitch)) * cos(glm::radians(camera.yaw));
+		front.y = sin(glm::radians(camera.pitch));
+		front.z = cos(glm::radians(camera.pitch)) * sin(glm::radians(camera.yaw));
+
+		camera.cameraFront = glm::normalize(front);
 	}
-
-	float xOffset = xpos - lastX;
-	float yOffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
-	lastX = xpos;
-	lastY = ypos;
-
-	float sensitivity = 0.09f;
-	xOffset *= sensitivity;
-	yOffset *= sensitivity;
-
-	camera.yaw += xOffset;
-	camera.pitch += yOffset;
-
-	//stop the mouse looping round the z axis, can only go as high as the sky and the floor
-	if (camera.pitch < -89.0f)
-		camera.pitch = -89.0;
-	if (camera.pitch > 89.0f)
-		camera.pitch = 89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(camera.pitch)) * cos(glm::radians(camera.yaw));
-	front.y = sin(glm::radians(camera.pitch));
-	front.z = cos(glm::radians(camera.pitch)) * sin(glm::radians(camera.yaw));
-
-	camera.cameraFront = glm::normalize(front);
 }
 ///_________________________________________________________________________________________________End of function
 
-bool wireframe = false;
-bool mouse = true;
-bool lightFollow = false;
 ///Key callback for keypresses we dont want to be repeated
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
 		mouse = !mouse;
+		camera.firstMouse = true;
 		mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);;;
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
@@ -244,7 +253,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Basic function to check for inputs
 void processInput(GLFWwindow *window) {
 
-	float cameraSpeed = 30.0f * deltaTime;
+	float cameraSpeed = (30.0f * cameraSpeedMultiplier) * deltaTime;
 	//check for the escape key and check if its been pressed
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true); // if true close window
@@ -285,17 +294,17 @@ int windowInit(GLFWwindow* window) {
 		glfwTerminate();
 		return -1;
 	}
-	glfwMakeContextCurrent(window); //target window of open gl we created
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetKeyCallback(window, key_callback);
-	glewInit(); // initialise glew componenets
-
 	//init GUI
 	ImGui::CreateContext();
 	ImGui_ImplGlfwGL3_Init(window, true);
 	ImGui::StyleColorsDark();
+
+	glfwMakeContextCurrent(window); //target window of open gl we created
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // create call back to for window resize
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glewInit(); // initialise glew componenets
+
 
 	return 0;
 }
@@ -382,13 +391,11 @@ int main() {
 	for (int o = 0; o < 7; o++) {
 		loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
 	}
-	//loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
 	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
 	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
 	
 	//chooseObjects();
-	
-	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
@@ -398,17 +405,10 @@ int main() {
 
 	objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 	objectShaders.setInt("texture", 0);
-	objectShaders.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-	objectShaders.setFloat("ambientLight", 0.2f);
 	setMTL(objectShaders, material);
 
 	glfwShowWindow(window);
-
 	glEnable(GL_DEPTH_TEST);
-
-	bool show_demo_window = true;
-	bool show_another_window = false;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -470,7 +470,6 @@ int main() {
 			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
-
 		
 		if (!lightFollow) {
 			//draw the light cube when not following camera, else move light with camera
@@ -489,28 +488,47 @@ int main() {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
 
-
-
-		static int counter = 0;
-		ImGui::Text("Edit Lighting in this here window!!\n");
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
-
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
+		//Main ImGui Window
+		ImGui::Begin("Main Settings", &showMainWindow);
+		ImGui::Text("Edit Settings in this here window!!\n\n");
+		ImGui::Text("-----------------------------");
+		ImGui::Text("Lighting Settings");
+		ImGui::Text(" ");
+		ImGui::SliderFloat(" Ambient Light Level", &ambientLight, 0.0f, 1.0f);  
+		ImGui::ColorEdit3(" Light Colour", (float*)&lightColor);
+		if (ImGui::Button("Teleport light to me"))             
+			lightPosition = camera.cameraPos + glm::vec3(0.0f,8.0f,0.0f);
+		ImGui::Text("-----------------------------");
+		ImGui::Checkbox(" Show Camera Settings\n", &showCameraWindow); 
+		ImGui::Text("-----------------------------");
+		ImGui::Checkbox(" Show Feature Buttons\n", &showFeaturesWindow);
+		ImGui::Text("-----------------------------");
+		ImGui::Text("FRAMERATE");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
 
+		if (showCameraWindow)
+		{
+			ImGui::Begin("CameraWindow", &showCameraWindow);
+			ImGui::Text("Edit Camera Settings in this here window!!\n\n");
+			ImGui::Text("-------------------------------------------------");
+			ImGui::SliderFloat(" Camera Speed Multiplier", &cameraSpeedMultiplier, 0.0f, 5.0f);
+			ImGui::SliderFloat(" Mouse Sensitivity", &mouseSensitivity, 0.0f, 5.0f);
+
+			if (ImGui::Button("Close Me"))
+				showCameraWindow = false;
+			ImGui::End();
+		}
 
 		//draw the GUI
 		ImGui::Render();
 		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
+		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
+		objectShaders.setFloat("ambientLight", ambientLight);
+		objectShaders.setVec3("lightColor", lightColor);
+		lightShaders.run();
+		lightShaders.setVec3("lightColor", lightColor);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
