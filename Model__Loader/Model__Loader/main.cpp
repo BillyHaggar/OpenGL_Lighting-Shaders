@@ -113,7 +113,7 @@ float lastFrame = 0.0f; // Time of last frame
 ///ImGUI variables
 bool showMainWindow = true;
 bool showCameraWindow = false;
-bool showFeaturesWindow = true;
+bool showFeaturesWindow = false;
 static glm::vec3 lightColor(1.0f);
 static float ambientLight = 0.2f;
 static float cameraSpeedMultiplier = 1.0f;
@@ -230,7 +230,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_1 && action == GLFW_RELEASE) {
 		mouse = !mouse;
 		camera.firstMouse = true;
-		mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);;;
+		mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
 		wireframe = !wireframe;
@@ -373,7 +373,85 @@ void chooseObjects() {
 			chooseObjects();
 		}
 }
+///_________________________________________________________________________________________________End of function
 
+///create the windows and options they will change
+void renderGui(GLFWwindow *window) {
+
+	//Main ImGui Window
+	ImGui::Begin("Main Settings", &showMainWindow);
+	ImGui::Text("Edit Settings in this here window!!\n\n");
+	ImGui::Text("-----------------------------");
+	ImGui::Text("Lighting Settings");
+	ImGui::Text(" ");
+	ImGui::SliderFloat(" Ambient Light Level", &ambientLight, 0.0f, 1.0f);
+	ImGui::ColorEdit3(" Light Colour", (float*)&lightColor);
+	if (ImGui::Button("Teleport light to me"))
+		lightPosition = camera.cameraPos + glm::vec3(0.0f, 8.0f, 0.0f);
+	ImGui::Text("-----------------------------");
+	ImGui::Checkbox(" Show Camera Settings\n", &showCameraWindow);
+	ImGui::Text("-----------------------------");
+	ImGui::Checkbox(" Show Feature Buttons\n", &showFeaturesWindow);
+	ImGui::Text("-----------------------------");
+	ImGui::Text("FRAMERATE");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
+
+	if (showCameraWindow)
+	{
+		ImGui::Begin("Camera Settings", &showCameraWindow);
+		ImGui::Text("Edit Camera Settings in this here window!!\n\n");
+		ImGui::Text("-------------------------------------------------");
+		ImGui::SliderFloat(" Camera Speed Multiplier", &cameraSpeedMultiplier, 0.0f, 5.0f);
+		ImGui::SliderFloat(" Mouse Sensitivity", &mouseSensitivity, 0.0f, 5.0f);
+
+		if (ImGui::Button("Close Me"))
+			showCameraWindow = false;
+		ImGui::End();
+	}
+
+	if (showFeaturesWindow)
+	{
+		ImGui::Begin("Features Settings", &showFeaturesWindow);
+		ImGui::Text("Toggle Features on and off here!!\n\n");
+		ImGui::Text("-------------------------------------------------");
+
+		if (ImGui::Button("1: Regain Camera Mouse Control")) {
+			mouse = !mouse;
+			camera.firstMouse = true;
+			mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+
+		if (ImGui::Button("2: Toggle WireFrames")) {
+			wireframe = !wireframe;
+			wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);;
+		}
+
+		if (ImGui::Button("3: Toggle Light Following Camera"))
+			lightFollow = !lightFollow;
+
+		if (ImGui::Button("4: Remove a Rendered Object")) {
+			if (objects.size() > 3) {
+				objects.erase(objects.begin() + (objects.size() - 1));
+			}
+		}
+
+		if (ImGui::Button("5: Toggle Textures")) {
+			for (int i = 0; i < objects.size(); i++) {
+				objects.at(i).swapTexture();
+			}
+		}
+
+		if (ImGui::Button("Close Me"))
+			showFeaturesWindow = false;
+		ImGui::End();
+	}
+
+	//draw the GUI
+	ImGui::Render();
+	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+}
+///_________________________________________________________________________________________________End of function
 
 ///main program run
 int main() {
@@ -488,41 +566,7 @@ int main() {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
 
-		//Main ImGui Window
-		ImGui::Begin("Main Settings", &showMainWindow);
-		ImGui::Text("Edit Settings in this here window!!\n\n");
-		ImGui::Text("-----------------------------");
-		ImGui::Text("Lighting Settings");
-		ImGui::Text(" ");
-		ImGui::SliderFloat(" Ambient Light Level", &ambientLight, 0.0f, 1.0f);  
-		ImGui::ColorEdit3(" Light Colour", (float*)&lightColor);
-		if (ImGui::Button("Teleport light to me"))             
-			lightPosition = camera.cameraPos + glm::vec3(0.0f,8.0f,0.0f);
-		ImGui::Text("-----------------------------");
-		ImGui::Checkbox(" Show Camera Settings\n", &showCameraWindow); 
-		ImGui::Text("-----------------------------");
-		ImGui::Checkbox(" Show Feature Buttons\n", &showFeaturesWindow);
-		ImGui::Text("-----------------------------");
-		ImGui::Text("FRAMERATE");
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
-
-		if (showCameraWindow)
-		{
-			ImGui::Begin("CameraWindow", &showCameraWindow);
-			ImGui::Text("Edit Camera Settings in this here window!!\n\n");
-			ImGui::Text("-------------------------------------------------");
-			ImGui::SliderFloat(" Camera Speed Multiplier", &cameraSpeedMultiplier, 0.0f, 5.0f);
-			ImGui::SliderFloat(" Mouse Sensitivity", &mouseSensitivity, 0.0f, 5.0f);
-
-			if (ImGui::Button("Close Me"))
-				showCameraWindow = false;
-			ImGui::End();
-		}
-
-		//draw the GUI
-		ImGui::Render();
-		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+		renderGui(window);
 
 		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 		objectShaders.setFloat("ambientLight", ambientLight);
