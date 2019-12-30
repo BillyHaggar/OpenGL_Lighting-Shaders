@@ -33,6 +33,18 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Media\Imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\Imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\Imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\Imgui\imgui_impl_glfw_gl3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -47,6 +59,7 @@
     <None Include="Media\Objects\low_poly_boat.dae" />
     <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Pouf.dae" />
+    <None Include="Media\Objects\Grid-obj\Grid.mtl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">
@@ -67,6 +80,27 @@
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Media\Imgui\imconfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\imgui_impl_glfw_gl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\imgui_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\stb_rect_pack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\stb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\Imgui\stb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Media\Image.png">
@@ -75,11 +109,18 @@
     <Image Include="Media\Objects\Creeper-obj\Texture.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Media\Grid.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Media\Objects\Grid-obj\Texture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Object Include="Media\Objects\Pouf-obj\pouf.obj" />
     <Object Include="Media\Objects\LowPolyBoat-obj\low_poly_boat.obj" />
     <Object Include="Media\Objects\Custom-obj\Custom.obj" />
     <Object Include="Media\Objects\Creeper-obj\Creeper.obj" />
+    <Object Include="Media\Objects\Grid-obj\Grid.obj" />
   </ItemGroup>
 </Project>
