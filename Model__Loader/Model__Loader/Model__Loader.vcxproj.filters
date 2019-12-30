@@ -60,6 +60,12 @@
     <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Pouf.dae" />
     <None Include="Media\Objects\Grid-obj\Grid.mtl" />
+    <None Include="blur.vs">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="blur.fs">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">

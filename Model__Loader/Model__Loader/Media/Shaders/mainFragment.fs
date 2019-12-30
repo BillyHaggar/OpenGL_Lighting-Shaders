@@ -24,6 +24,11 @@ uniform vec3 lightPos;
 uniform vec3 viewPosition;
 uniform Material material;
 
+uniform sampler2D scene;
+uniform sampler2D bloomBlur;
+uniform bool bloom;
+uniform float exposure;
+
 void main(){
 
 	//diffuse
@@ -41,7 +46,16 @@ void main(){
 	vec3 specular = specularStrength * spec * lightColor; 
 
 
-	vec3 result = (ambientLight + diffuse + specular) * inColor;
+	vec3 result = ((ambientLight + diffuse + specular) * inColor)  - exp(-hdrColor * exposure);;
+
+	const float gamma = 2.2;
+    vec3 hdrColor = texture(scene, TexCoords).rgb;      
+    vec3 bloomColor = texture(bloomBlur, TexCoords).rgb;
+    if(bloom)
+        hdrColor += bloomColor; // additive blending
+    // tone mapping
+    // also gamma correct while we're at it       
+    result = pow(result, vec3(1.0 / gamma));
 
 
 	FragColor = texture(texture, inTexture) * vec4(result, 1.0);
