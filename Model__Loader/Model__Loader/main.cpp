@@ -566,6 +566,7 @@ int main() {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
 
+		//Imgui Gui windows
 		renderGui(window);
 
 		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
