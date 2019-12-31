@@ -1,4 +1,3 @@
-
 ///image stb_image.h loader
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -483,6 +482,8 @@ int main() {
 
 	glfwShowWindow(window);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
