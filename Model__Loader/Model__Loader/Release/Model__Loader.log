@@ -1,16 +1,4 @@
-﻿  Camera.cpp
-  Loader.cpp
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(87): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(139): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(316): warning C4129: 's': unrecognized character escape sequence
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(316): warning C4129: '.': unrecognized character escape sequence
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(407): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(419): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\loader.cpp(354): warning C4101: 'z': unreferenced local variable
-  Material.cpp
-  imgui_impl_glfw_gl3.cpp
-  Mesh.cpp
-  main.cpp
+﻿  main.cpp
 c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(183): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(184): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(194): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
