@@ -60,6 +60,8 @@
     <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Pouf.dae" />
     <None Include="Media\Objects\Grid-obj\Grid.mtl" />
+    <None Include="Media\Shaders\screenFragment.fs" />
+    <None Include="Media\Shaders\screenVertex.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">

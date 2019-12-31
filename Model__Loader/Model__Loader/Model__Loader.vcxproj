@@ -147,6 +147,8 @@
     <None Include="Media\Shaders\lightVertex.vs" />
     <None Include="Media\Shaders\mainFragment.fs" />
     <None Include="Media\Shaders\mainVertex.vs" />
+    <None Include="Media\Shaders\screenFragment.fs" />
+    <None Include="Media\Shaders\screenVertex.vs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -38,6 +38,7 @@ void main(){
 	vec3 reflectDir = reflect(-lightDir, norm);
 	vec3 halfwayDir = normalize(lightDir + viewDir); 
 
+	//blinn phong
 	float spec = pow(max(dot(norm, halfwayDir), 0.0), 64);
 	vec3 specular = specularStrength * spec * lightColor; 
 

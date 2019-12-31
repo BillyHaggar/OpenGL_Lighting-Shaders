@@ -464,6 +464,30 @@ int main() {
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
+
+	float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+	   // positions   // texCoords
+	   -1.0f,  1.0f,  0.0f, 1.0f,
+	   -1.0f, -1.0f,  0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+
+	   -1.0f,  1.0f,  0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f
+	};
+	// screen quad VAO
+	unsigned int quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
 	for (int o = 0; o < 7; o++) {
@@ -473,6 +497,7 @@ int main() {
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
 	Shader lightShaders("Media\\Shaders\\lightVertex.vs", "Media\\Shaders\\lightFragment.fs");
+	Shader screenShaders("Media\\Shaders\\screenVertex.vs", "Media\\Shaders\\screenFragment.fs");
 
 	lightInit();
 
@@ -483,7 +508,32 @@ int main() {
 	glfwShowWindow(window);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
+
+	//Frame Buffer
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// create a color attachment texture
+	unsigned int textureColorbuffer;
+	glGenTextures(1, &textureColorbuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, windowWidth, windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowWidth, windowHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+	// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -495,6 +545,10 @@ int main() {
 		lastFrame = currentFrame;
 
 		processInput(window);// the key checks above for the escape key to close the window (own version)
+
+		//bind framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
 		glClearColor(0.25f, 0.25f, 0.35f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
@@ -563,14 +617,27 @@ int main() {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
 
-		//Imgui Gui windows
-		renderGui(window);
 
 		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
 		objectShaders.setFloat("ambientLight", ambientLight);
 		objectShaders.setVec3("lightColor", lightColor);
 		lightShaders.run();
 		lightShaders.setVec3("lightColor", lightColor);
+
+		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+		// clear all relevant buffers
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		screenShaders.run();
+		glBindVertexArray(quadVAO);
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		//Imgui Gui windows
+		renderGui(window);
 
 		glfwSwapBuffers(window); //another buffer for rendering
 		glfwPollEvents(); // Deals with pollling events such as key events
