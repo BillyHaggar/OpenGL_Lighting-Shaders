@@ -120,17 +120,6 @@ static float cameraSpeedMultiplier = 1.0f;
 static float mouseSensitivity = 1.0f;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
-///OpenGl packages all initialisations
-void init() {
-	//intialise the required GLFW things
-	glewExperimental = GL_TRUE; //needed for some reason unknown
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-///_________________________________________________________________________________________________End of function
-
 ///init object structs
 void initObjectPaths() {
 	creeper.name = "Creeper";
@@ -160,6 +149,17 @@ void initObjectPaths() {
 }
 ///_________________________________________________________________________________________________End of function
 
+///OpenGl packages all initialisations
+void init() {
+	initObjectPaths();
+	//intialise the required GLFW things
+	glewExperimental = GL_TRUE; //needed for some reason unknown
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+///_________________________________________________________________________________________________End of function
 
 ///create qnd fill the creeper_VAO, creeper_VBO for the light object
 void lightInit() {
@@ -453,12 +453,12 @@ void renderGui(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
 	init();
-	initObjectPaths();
 
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
@@ -469,11 +469,6 @@ int main() {
 	for (int o = 0; o < 7; o++) {
 		loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
 	}
-	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
-	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
-	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
-	
-	//chooseObjects();
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
