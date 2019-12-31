@@ -1,3 +1,4 @@
+
 ///image stb_image.h loader
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -44,7 +45,7 @@ glm::vec3 objectPositions[8] = {
 };
 
 ///light data_________________________________________________
-float lightCube[36*3] = {
+float lightCube[36 * 3] = {
 		-0.5f, -0.5f, -0.5f,
 		 0.5f, -0.5f, -0.5f,
 		 0.5f,  0.5f, -0.5f,
@@ -120,17 +121,6 @@ static float cameraSpeedMultiplier = 1.0f;
 static float mouseSensitivity = 1.0f;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
-///OpenGl packages all initialisations
-void init() {
-	//intialise the required GLFW things
-	glewExperimental = GL_TRUE; //needed for some reason unknown
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-///_________________________________________________________________________________________________End of function
-
 ///init object structs
 void initObjectPaths() {
 	creeper.name = "Creeper";
@@ -160,15 +150,26 @@ void initObjectPaths() {
 }
 ///_________________________________________________________________________________________________End of function
 
+///OpenGl packages all initialisations
+void init() {
+	initObjectPaths();
+	//intialise the required GLFW things
+	glewExperimental = GL_TRUE; //needed for some reason unknown
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
+///_________________________________________________________________________________________________End of function
 
 ///create qnd fill the creeper_VAO, creeper_VBO for the light object
 void lightInit() {
 	glGenVertexArrays(1, &light_VAO);
 	glGenBuffers(1, &light_VBO);
-	
+
 	glBindVertexArray(light_VAO); // bind this new creeper_VAO
 	glBindBuffer(GL_ARRAY_BUFFER, light_VBO);
-	
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -241,9 +242,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_4 && action == GLFW_RELEASE && objects.size() > 3) { //only allow to go down to 3
 		objects.erase(objects.begin() + (objects.size() - 1)); // better than pop back, will clear the allocated memory too!
 	}
-	if (key == GLFW_KEY_5 && action == GLFW_RELEASE){
+	if (key == GLFW_KEY_5 && action == GLFW_RELEASE) {
 		for (int i = 0; i < objects.size(); i++) {
-		objects.at(i).swapTexture();
+			objects.at(i).swapTexture();
 		}
 	}
 }
@@ -346,32 +347,32 @@ void chooseObjects() {
 	cout << "Please enter 'Exit' for No, otherwise select an object below to render..." << endl << endl;
 	string x;
 
-		cout << "Please select by typing either 'Creeper' : 'Boat' : 'Pouf' : 'Custom' " << endl << endl;
-		cin >> x;
-		cout << endl;
-		if (x == creeper.name) {
-			loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
-			chooseObjects();
-		} 
-		else if (x == boat.name) {
-			loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
-			chooseObjects();
-		}
-		else if (x == pouf.name) {
-			loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
-			chooseObjects();
-		}
-		else if (x == custom.name) {
-			loadObjects(custom.objectPath, custom.mtlPath, 0.3f);
-			chooseObjects();
-		}
-		else if (x == "Exit") {
-			return; //do nothing
-		}
-		else {
-			cout << "INVALID SELECTION: CHECK CASE?" << endl << endl;
-			chooseObjects();
-		}
+	cout << "Please select by typing either 'Creeper' : 'Boat' : 'Pouf' : 'Custom' " << endl << endl;
+	cin >> x;
+	cout << endl;
+	if (x == creeper.name) {
+		loadObjects(creeper.objectPath, creeper.mtlPath, 40.0f);
+		chooseObjects();
+	}
+	else if (x == boat.name) {
+		loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+		chooseObjects();
+	}
+	else if (x == pouf.name) {
+		loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
+		chooseObjects();
+	}
+	else if (x == custom.name) {
+		loadObjects(custom.objectPath, custom.mtlPath, 0.3f);
+		chooseObjects();
+	}
+	else if (x == "Exit") {
+		return; //do nothing
+	}
+	else {
+		cout << "INVALID SELECTION: CHECK CASE?" << endl << endl;
+		chooseObjects();
+	}
 }
 ///_________________________________________________________________________________________________End of function
 
@@ -453,12 +454,12 @@ void renderGui(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
+
 ///main program run
 int main() {
 	cout << "Program Running..." << endl;
 	cout << "Press escape to close software..." << endl << endl;
 	init();
-	initObjectPaths();
 
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
@@ -469,11 +470,6 @@ int main() {
 	for (int o = 0; o < 7; o++) {
 		loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
 	}
-	//loadObjectsDAE("Media\\Objects\\low_poly_boat.dae", 0.3f);
-	//loadObjects(pouf.objectPath, pouf.mtlPath, 60.0f);
-	//loadObjects(custom.objectPath, custom.mtlPath, 0.3);
-	
-	//chooseObjects();
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
@@ -491,12 +487,12 @@ int main() {
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
 		ImGui_ImplGlfwGL3_NewFrame();//create a new frame for GUI
-		
+
 		//calulate time between frames
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		
+
 		processInput(window);// the key checks above for the escape key to close the window (own version)
 
 		glClearColor(0.25f, 0.25f, 0.35f, 0.3f); //set background render colour
@@ -506,7 +502,7 @@ int main() {
 		//set up the main shaders and bind ready to render
 		objectShaders.run();
 		objectShaders.setVec3("viewPosition", camera.cameraPos);
-		objectShaders.setVec3("lightPos", lightPosition);	
+		objectShaders.setVec3("lightPos", lightPosition);
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
@@ -548,7 +544,7 @@ int main() {
 			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
 		}
 
-		
+
 		if (!lightFollow) {
 			//draw the light cube when not following camera, else move light with camera
 			lightShaders.run();
