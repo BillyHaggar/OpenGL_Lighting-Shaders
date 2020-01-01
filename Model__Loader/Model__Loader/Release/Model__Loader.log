@@ -1,20 +1,7 @@
-﻿  main.cpp
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(183): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(184): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(194): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(195): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(199): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(200): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(201): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(202): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(245): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(440): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(543): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(585): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(647): warning C4018: '<': signed/unsigned mismatch
+﻿  FrameBuffer.cpp
   Generating code
-  1 of 2194 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  0 of 2194 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Model__Loader.vcxproj -> C:\Users\Billiam\Documents\Year3\SOFT356\BHaggar_MMP\Model__Loader\Release\Model__Loader.exe
