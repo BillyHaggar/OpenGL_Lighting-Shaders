@@ -1,17 +1,17 @@
 ﻿  main.cpp
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(183): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(184): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(194): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(195): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(199): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(200): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(201): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(202): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(245): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(440): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(602): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(645): warning C4018: '<': signed/unsigned mismatch
-c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(726): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(185): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(186): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(196): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(197): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(201): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(202): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(203): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(204): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(247): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(442): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(587): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(630): warning C4018: '<': signed/unsigned mismatch
+c:\users\billiam\documents\year3\soft356\bhaggar_mmp\model__loader\model__loader\main.cpp(709): warning C4018: '<': signed/unsigned mismatch
   Generating code
   1 of 2195 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation

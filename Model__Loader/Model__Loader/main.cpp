@@ -118,6 +118,8 @@ static glm::vec3 lightColor(1.0f);
 static float ambientLight = 0.2f;
 static float cameraSpeedMultiplier = 1.0f;
 static float mouseSensitivity = 1.0f;
+bool bloom = true;
+float exposure = 1.0f;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
 ///init object structs
@@ -444,6 +446,9 @@ void renderGui(GLFWwindow *window) {
 
 		if (ImGui::Button("Close Me"))
 			showFeaturesWindow = false;
+
+		ImGui::Checkbox("Enable Bloom?", &bloom);      // Edit bools storing our windows open/close state
+
 		ImGui::End();
 	}
 
@@ -491,29 +496,6 @@ int main() {
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
 
-	////screen overlay to render post processing efffects to, just a quad the size of the screen
-	//float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-	//   // positions   // texCoords
-	//   -1.0f,  1.0f,  0.0f, 1.0f,
-	//   -1.0f, -1.0f,  0.0f, 0.0f,
-	//	1.0f, -1.0f,  1.0f, 0.0f,
-
-	//   -1.0f,  1.0f,  0.0f, 1.0f,
-	//	1.0f, -1.0f,  1.0f, 0.0f,
-	//	1.0f,  1.0f,  1.0f, 1.0f
-	//};
-	//// screen quad VAO
-	//unsigned int quadVAO, quadVBO;
-	//glGenVertexArrays(1, &quadVAO);
-	//glGenBuffers(1, &quadVBO);
-	//glBindVertexArray(quadVAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
 
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
@@ -536,7 +518,7 @@ int main() {
 	glfwShowWindow(window);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 	//Frame Buffer
@@ -590,9 +572,12 @@ int main() {
 			cout << "NOT COMPLETE" << endl;
 	}
 
+	objectShaders.run();
+	objectShaders.setInt("diffuseTexture", 0);
 	screenShaders.run();
 	screenShaders.setInt("screenTexture", 0);
 	screenShaders.setInt("blurTexture", 1);
+	
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -703,8 +688,6 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, textureColorbuffers[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[!horizontal]);
-		bool bloom = true;
-		float exposure = 1.0f;
 		screenShaders.setInt("bloom", bloom);
 		screenShaders.setFloat("exposure", exposure);
 		renderQuad();

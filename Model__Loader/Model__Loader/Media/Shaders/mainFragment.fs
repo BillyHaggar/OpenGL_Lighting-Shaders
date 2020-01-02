@@ -20,6 +20,7 @@ struct Material {
 };
 
 uniform sampler2D texture;
+uniform sampler2D diffuseTexture;
 uniform vec3 lightColor;
 uniform float ambientLight;
 uniform vec3 lightPos;
