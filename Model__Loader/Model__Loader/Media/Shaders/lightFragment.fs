@@ -14,5 +14,6 @@ void main()
 	if(brightness > 0.3)
         BrightColor = vec4(lightColor.rgb, 1.0);
     else
-        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+        BrightColor = vec4(0.0, 0.0, 0.0, 0.0);
+
 }

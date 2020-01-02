@@ -65,6 +65,8 @@
     <None Include="Media\Objects\Grid-obj\Grid.mtl" />
     <None Include="Media\Shaders\screenFragment.fs" />
     <None Include="Media\Shaders\screenVertex.vs" />
+    <None Include="Media\Shaders\blurVertex.vs" />
+    <None Include="Media\Shaders\blurFragment.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">
