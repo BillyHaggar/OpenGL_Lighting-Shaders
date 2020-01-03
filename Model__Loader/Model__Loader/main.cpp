@@ -21,12 +21,14 @@
 #include <iostream>
 #include <vector>
 
+///as std:: is used alot this makes the reading of the code alittle easier to just include it, 
+//rather than including it every time it is needed
 using namespace std;
-/*--------------------- SETTINGS AND GLOBAL VARIABLES ---------------------------------------------------------------------*/
+/*--------------------- SETTINGS AND GLOBAL VARIABLES -------------------------------------------------------------------------------------*/
 ///Settings____________________________________________________
 //set the window height and width here
 const unsigned int windowWidth = 1600; // default value 1600 width
-const unsigned int windowHeight = 1200; // default value 1200 widtH
+const unsigned int windowHeight = 1200; // default value 1200 width
 
 ///buffers__________________________________________________
 unsigned int light_VAO, light_VBO;
@@ -86,13 +88,16 @@ glm::vec3 lightPosition(100.0, 35.0, 110.0);
 
 ///object creators_______________________________________________
 Camera camera;
-bool wireframe = false;
-bool mouse = false;
-bool lightFollow = false;
 Material material;
 Loader loader;
 std::vector<Mesh> objects;
 
+///Boolean States
+bool wireframe = false;
+bool mouse = false;
+bool lightFollow = false;
+
+///struct to store information for files relating to an object that can be loaded__________
 struct objectPaths {
 	string name;
 	const char * objectPath;
@@ -100,13 +105,11 @@ struct objectPaths {
 	const char * basePath;
 }creeper, boat, pouf, custom, grid;
 
-
-///other variables ____________________________________________________
+///other variables _________________________________________________________________________
 //declare the locations for the mouse location
 //Initialise with the original location of the centre of the window
 float lastX = windowWidth / 2;
 float lastY = windowHeight / 2;
-
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
@@ -379,7 +382,6 @@ void chooseObjects() {
 
 ///create the GUI windows and options they will change
 void renderGui(GLFWwindow *window) {
-
 	//Main ImGui Window
 	ImGui::Begin("Main Settings", &showMainWindow);
 	ImGui::Text("Edit Settings in this here window!!\n\n");
@@ -404,9 +406,8 @@ void renderGui(GLFWwindow *window) {
 		ImGui::Begin("Camera Settings", &showCameraWindow);
 		ImGui::Text("Edit Camera Settings in this here window!!\n\n");
 		ImGui::Text("-------------------------------------------------");
-		ImGui::SliderFloat(" Camera Speed Multiplier", &cameraSpeedMultiplier, 0.0f, 5.0f);
-		ImGui::SliderFloat(" Mouse Sensitivity", &mouseSensitivity, 0.0f, 5.0f);
-
+		ImGui::SliderFloat(" Camera Speed Multiplier", &cameraSpeedMultiplier, 0.0f, 4.0f);
+		ImGui::SliderFloat(" Mouse Sensitivity", &mouseSensitivity, 0.0f, 4.0f);
 		if (ImGui::Button("Close Me"))
 			showCameraWindow = false;
 		ImGui::End();
@@ -417,38 +418,30 @@ void renderGui(GLFWwindow *window) {
 		ImGui::Begin("Features Settings", &showFeaturesWindow);
 		ImGui::Text("Toggle Features on and off here!!\n\n");
 		ImGui::Text("-------------------------------------------------");
-
 		if (ImGui::Button("1: Regain Camera Mouse Control")) {
 			mouse = !mouse;
 			camera.firstMouse = true;
 			mouse ? glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED) : glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
-
 		if (ImGui::Button("2: Toggle WireFrames")) {
 			wireframe = !wireframe;
 			wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);;
 		}
-
 		if (ImGui::Button("3: Toggle Light Following Camera"))
 			lightFollow = !lightFollow;
-
 		if (ImGui::Button("4: Remove a Rendered Object")) {
 			if (objects.size() > 3) {
 				objects.erase(objects.begin() + (objects.size() - 1));
 			}
 		}
-
 		if (ImGui::Button("5: Toggle Textures")) {
 			for (int i = 0; i < objects.size(); i++) {
 				objects.at(i).swapTexture();
 			}
 		}
-
+		ImGui::Checkbox("Enable Bloom?", &bloom);      // Edit bools storing our windows open/close state
 		if (ImGui::Button("Close Me"))
 			showFeaturesWindow = false;
-
-		ImGui::Checkbox("Enable Bloom?", &bloom);      // Edit bools storing our windows open/close state
-
 		ImGui::End();
 	}
 
@@ -458,14 +451,14 @@ void renderGui(GLFWwindow *window) {
 }
 ///_________________________________________________________________________________________________End of function
 
-///Rendwer quad from learnopenGL, Short cut for rendering a overlay over the Glew Window
+///Render quad from learnopenGL, Short cut for rendering a overlay over the Glew Window
 unsigned int quadVAO = 0; // as above vao and vbo needed to render
 unsigned int quadVBO;
 void renderQuad()
 {
 	if (quadVAO == 0)
 	{
-		float quadVertices[] = {
+		float screenOverlay[] = {
 			// positions        // texture Coords
 			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -477,21 +470,22 @@ void renderQuad()
 		glGenBuffers(1, &quadVBO);
 		glBindVertexArray(quadVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(screenOverlay), &screenOverlay, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // this needed to be done as if wire frame mode is enabled the overlay will block all the object meshes
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
-	wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//render the rest of the objects as wanted
 }
 ///_________________________________________________________________________________________________End of Function
 
-void renderScene(Shader &shader)
+///render all objects and grid to be displayed
+void renderObjects(Shader &shader)
 {
 	//set up the main shaders and bind ready to render
 	shader.run();
@@ -515,7 +509,6 @@ void renderScene(Shader &shader)
 			modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (-40.0f * y))));
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(0).scale));
 			shader.setMat4("model", modelMatrix);
-
 			glDrawElements(GL_TRIANGLES, objects.at(0).indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
@@ -524,7 +517,6 @@ void renderScene(Shader &shader)
 	for (int i = 1; i < objects.size(); i++) {
 		glBindVertexArray(objects.at(i).VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
-
 		//change the model matrix for each object
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
@@ -534,12 +526,83 @@ void renderScene(Shader &shader)
 		shader.setMat4("model", modelMatrix);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, objects.at(i).texture);
-
 		glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
+	}
+}
+///_________________________________________________________________________________________________End of Function
+
+///Initialise all things shadows such as the framebuffer and depth map needed for shadow calulation
+unsigned int depthMapFBO;
+unsigned int shadowDepthMap;
+void shadowInit() {
+	//Shadows
+	glGenFramebuffers(1, &depthMapFBO);
+	glGenTextures(1, &shadowDepthMap);
+	glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowDepthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+}
+///_________________________________________________________________________________________________End of Function
+
+///Initialise all things needed for bloom such as the framebuffers and depth map used to find bright areas
+///alos generate the framebuffers for blurring the image
+unsigned int framebuffer;
+unsigned int textureColorbuffers[2];
+unsigned int rbo;
+unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+unsigned int pingpongFBO[2];
+unsigned int pingpongBuffer[2];
+void bloomInit() {
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// create a color attachment textures
+	glGenTextures(2, textureColorbuffers);
+	for (unsigned int i = 0; i < 2; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffers[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureColorbuffers[i], 0);
 	}
 
 
+	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+
+	glDrawBuffers(2, attachments);
+
+	//bluring Framebuffers, appliess a guassian blur in the horizontal and vertical directions
+	glGenFramebuffers(2, pingpongFBO);
+	glGenTextures(2, pingpongBuffer);
+	for (unsigned int i = 0; i < 2; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
+	}
 }
+///_________________________________________________________________________________________________End of Function
 
 ///main program run
 int main() {
@@ -550,7 +613,6 @@ int main() {
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Model_Loader", NULL, NULL);
 	windowInit(window);
-
 
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
@@ -574,84 +636,12 @@ int main() {
 	glfwShowWindow(window);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glEnable(GL_FRAMEBUFFER_SRGB);
 
-
-	//Shadows
-	unsigned int depthMapFBO;
-	glGenFramebuffers(1, &depthMapFBO);
-	unsigned int shadowDepthMap;
-	glGenTextures(1, &shadowDepthMap);
-	glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowDepthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	shadowInit();
 	
 	objectShaders.run();
 	objectShaders.setInt("shadowTexture", depthMapFBO);
-
-	//Frame Buffer
-	unsigned int framebuffer;
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// create a color attachment textures
-	unsigned int textureColorbuffers[2];
-	glGenTextures(2, textureColorbuffers);
-	for (unsigned int i = 0; i < 2; i++)
-	{
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffers[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(	GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureColorbuffers[i], 0);
-	}
-
-	
-	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-	
-	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, attachments);
-	// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	unsigned int pingpongFBO[2];
-	unsigned int pingpongBuffer[2];
-	glGenFramebuffers(2, pingpongFBO);
-	glGenTextures(2, pingpongBuffer);
-	for (unsigned int i = 0; i < 2; i++)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER)!= GL_FRAMEBUFFER_COMPLETE)
-			cout << "NOT COMPLETE" << endl;
-	}
-
+	bloomInit();
 
 	objectShaders.run();
 	objectShaders.setInt("diffuseTexture", 0);
@@ -673,33 +663,32 @@ int main() {
 		glClearColor(0.25f, 0.25f, 0.35f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
-		// 1. render depth of scene to texture (from light's perspective)
-		// --------------------------------------------------------------
+		//render depth of scene to texture to calculate shadows
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 1.0f, far_plane = 1000.0f;
-		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)windowWidth / (GLfloat)windowHeight, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-		lightProjection = glm::ortho(-100.0f, 300.0f, -220.0f, 420.0f, near_plane, far_plane);
+		//play around with these locations to change where the shadows appear
+		float near_plane = 1.0f, far_plane = 1000.0f; 
+		lightProjection = glm::ortho(-250.0f, 350.0f, -300.0f, 420.0f, near_plane, far_plane);
 		lightView = glm::lookAt(lightPosition, glm::vec3(130.0f, -30.0f, -118.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		lightSpaceMatrix = lightProjection * lightView;
 		// render scene from light's point of view
 		shadowShaders.run();
 		shadowShaders.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
+		//apply the texture of the depthmap to the shadow depth map framebuffer objects
 		glViewport(0, 0, windowWidth, windowHeight);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
-		renderScene(shadowShaders);
+		renderObjects(shadowShaders);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// reset viewport
 		glViewport(0, 0, windowWidth, windowHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// 2. render scene as normal using the generated depth/shadow map  
-		// --------------------------------------------------------------
+		//render scene as normal using the generated depth/shadow map  
 		glViewport(0, 0, windowWidth, windowHeight);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		objectShaders.run();
@@ -715,15 +704,14 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, objects.at(0).texture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
-		renderScene(objectShaders);
-		//bind framebuffer for the screen post effects
+		renderObjects(objectShaders);
+
+		//bind framebuffer for the screen post effects and run them
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
-		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		renderObjects(objectShaders);
 
-		
-		renderScene(objectShaders);
-
+		//draw light cube
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
@@ -743,11 +731,10 @@ int main() {
 		else {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
-
 		glEnable(GL_DEPTH_TEST);
-		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		//apply bluring to the brighter areas for the bloom
 		bool horizontal = true, first_iteration = true;
 		unsigned int amount = 10;
 		bluringShaders.run();
@@ -763,6 +750,7 @@ int main() {
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		//render the post FX
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		screenShaders.run();
 		glActiveTexture(GL_TEXTURE0);
@@ -772,7 +760,6 @@ int main() {
 		screenShaders.setInt("bloom", bloom);
 		screenShaders.setFloat("exposure", exposure);
 		renderQuad();
-
 
 		//Imgui Gui windows
 		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
@@ -795,6 +782,8 @@ int main() {
 	}
 	glDeleteVertexArrays(1, &light_VAO);
 	glDeleteBuffers(1, &light_VBO);
+	glDeleteVertexArrays(1, &quadVAO);
+	glDeleteBuffers(1, &quadVBO);
 
 	//clean up and close down correctly
 	ImGui_ImplGlfwGL3_Shutdown();
