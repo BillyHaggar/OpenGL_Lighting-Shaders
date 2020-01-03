@@ -5,6 +5,7 @@ in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 uniform sampler2D blurTexture;
+uniform sampler2D shadowTexture;
 uniform bool bloom;
 uniform float exposure;
 

@@ -152,6 +152,8 @@
     <None Include="Media\Shaders\blurFragment.fs" />
     <None Include="Media\Shaders\screenFragment.fs" />
     <None Include="Media\Shaders\screenVertex.vs" />
+    <None Include="Media\Shaders\shadowFragment.fs" />
+    <None Include="Media\Shaders\shadowVertex.vs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

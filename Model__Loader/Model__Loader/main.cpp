@@ -118,7 +118,7 @@ static glm::vec3 lightColor(1.0f);
 static float ambientLight = 0.2f;
 static float cameraSpeedMultiplier = 1.0f;
 static float mouseSensitivity = 1.0f;
-bool bloom = true;
+bool bloom = false;
 float exposure = 1.0f;
 
 /*-------------------- FUNCTIONS -------------------------------------------------------------------------------------------*/
@@ -457,6 +457,7 @@ void renderGui(GLFWwindow *window) {
 	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 }
 ///_________________________________________________________________________________________________End of function
+///Rendwer quad from learnopenGL
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
 void renderQuad()
@@ -485,6 +486,57 @@ void renderQuad()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
+///_________________________________________________________________________________________________End of Function
+
+void renderScene(Shader &shader)
+{
+	//set up the main shaders and bind ready to render
+	shader.run();
+	shader.setVec3("viewPosition", camera.cameraPos);
+	shader.setVec3("lightPos", lightPosition);
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
+	glm::mat4 viewMatrix = glm::mat4(1.0f);
+	viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
+	shader.setMat4("projection", projectionMatrix);
+	shader.setMat4("view", viewMatrix);
+
+	//draw grid
+	glBindVertexArray(objects.at(0).VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, objects.at(0).VBO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, objects.at(0).texture);
+	for (int y = 0; y < 10; y++) {
+		for (int x = 0; x < 10; x++) {
+			//change the model matrix for each object
+			glm::mat4 modelMatrix = glm::mat4(1.0f);
+			modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (-40.0f * y))));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(0).scale));
+			shader.setMat4("model", modelMatrix);
+
+			glDrawElements(GL_TRIANGLES, objects.at(0).indices.size(), GL_UNSIGNED_INT, 0);
+		}
+	}
+
+	//repeate for abount of objects
+	for (int i = 1; i < objects.size(); i++) {
+		glBindVertexArray(objects.at(i).VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
+
+		//change the model matrix for each object
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(i).scale));
+		float angle = 20.0f * i;
+		modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		shader.setMat4("model", modelMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, objects.at(i).texture);
+
+		glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
+	}
+
+
+}
 
 ///main program run
 int main() {
@@ -507,6 +559,7 @@ int main() {
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
 	Shader lightShaders("Media\\Shaders\\lightVertex.vs", "Media\\Shaders\\lightFragment.fs");
 	Shader screenShaders("Media\\Shaders\\screenVertex.vs", "Media\\Shaders\\screenFragment.fs");
+	Shader shadowShaders("Media\\Shaders\\shadowVertex.vs", "Media\\Shaders\\shadowFragment.fs");
 	Shader bluringShaders("Media\\Shaders\\blurVertex.vs", "Media\\Shaders\\blurFragment.fs");
 
 	lightInit();
@@ -520,6 +573,30 @@ int main() {
 	glEnable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
+
+
+	//Shadows
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	unsigned int shadowDepthMap;
+	glGenTextures(1, &shadowDepthMap);
+	glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowDepthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	
+	objectShaders.run();
+	objectShaders.setInt("shadowTexture", depthMapFBO);
 
 	//Frame Buffer
 	unsigned int framebuffer;
@@ -572,12 +649,12 @@ int main() {
 			cout << "NOT COMPLETE" << endl;
 	}
 
+
 	objectShaders.run();
 	objectShaders.setInt("diffuseTexture", 0);
 	screenShaders.run();
 	screenShaders.setInt("screenTexture", 0);
 	screenShaders.setInt("blurTexture", 1);
-	
 
 	//Main drawing loop, effectivly what will happen evey frame (easy way to think about it)
 	while (!glfwWindowShouldClose(window)) {
@@ -589,62 +666,64 @@ int main() {
 		lastFrame = currentFrame;
 
 		processInput(window);// the key checks above for the escape key to close the window (own version)
-
-
+		
 		glClearColor(0.25f, 0.25f, 0.35f, 0.3f); //set background render colour
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 
+		// 1. render depth of scene to texture (from light's perspective)
+		// --------------------------------------------------------------
+		glm::mat4 lightProjection, lightView;
+		glm::mat4 lightSpaceMatrix;
+		float near_plane = 0.0f, far_plane = 1000.0f;
+		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)windowWidth / (GLfloat)windowHeight, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPosition, glm::vec3(170.0f, -30.0f, -175.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightSpaceMatrix = lightProjection * lightView;
+		// render scene from light's point of view
+		shadowShaders.run();
+		shadowShaders.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, windowWidth, windowHeight);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
+		renderScene(shadowShaders);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// reset viewport
+		glViewport(0, 0, windowWidth, windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 2. render scene as normal using the generated depth/shadow map  
+		// --------------------------------------------------------------
+		glViewport(0, 0, windowWidth, windowHeight);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		objectShaders.run();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
+		glm::mat4 view = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
+		objectShaders.setMat4("projection", projection);
+		objectShaders.setMat4("view", view);
+		// set light uniforms
+		objectShaders.setVec3("viewPos", camera.cameraPos);
+		objectShaders.setVec3("lightPos", lightPosition);
+		objectShaders.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, objects.at(0).texture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
+		renderScene(objectShaders);
 		//bind framebuffer for the screen post effects
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear the colour buffer
 		//glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
-		//set up the main shaders and bind ready to render
-		objectShaders.run();
-		objectShaders.setVec3("viewPosition", camera.cameraPos);
-		objectShaders.setVec3("lightPos", lightPosition);
+		
+		renderScene(objectShaders);
+
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.fov), (float)windowWidth / (float)windowHeight, 0.1f, 1000.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		viewMatrix = glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);
-		objectShaders.setMat4("projection", projectionMatrix);
-		objectShaders.setMat4("view", viewMatrix);
-
-		//draw grid
-		glBindVertexArray(objects.at(0).VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, objects.at(0).VBO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, objects.at(0).texture);
-		for (int y = 0; y < 10; y++) {
-			for (int x = 0; x < 10; x++) {
-				//change the model matrix for each object
-				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, (objectPositions[0] + glm::vec3((40.0f * (x + 1)), 0.0f, (-40.0f * y))));
-				modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(0).scale));
-				objectShaders.setMat4("model", modelMatrix);
-
-				glDrawElements(GL_TRIANGLES, objects.at(0).indices.size(), GL_UNSIGNED_INT, 0);
-			}
-		}
-
-		//repeate for abount of objects
-		for (int i = 1; i < objects.size(); i++) {
-			glBindVertexArray(objects.at(i).VAO);
-			glBindBuffer(GL_ARRAY_BUFFER, objects.at(i).VBO);
-
-			//change the model matrix for each object
-			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			modelMatrix = glm::translate(modelMatrix, objectPositions[i]);
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(objects.at(i).scale));
-			float angle = 20.0f * i;
-			modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			objectShaders.setMat4("model", modelMatrix);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, objects.at(i).texture);
-
-			glDrawElements(GL_TRIANGLES, objects.at(i).indices.size(), GL_UNSIGNED_INT, 0);
-		}
-
-
 		if (!lightFollow) {
 			//draw the light cube when not following camera, else move light with camera
 			lightShaders.run();
@@ -661,7 +740,6 @@ int main() {
 		else {
 			lightPosition = glm::vec3(camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z + 5.0f);
 		}
-
 
 		glEnable(GL_DEPTH_TEST);
 		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
@@ -691,6 +769,7 @@ int main() {
 		screenShaders.setInt("bloom", bloom);
 		screenShaders.setFloat("exposure", exposure);
 		renderQuad();
+
 
 		//Imgui Gui windows
 		objectShaders.run(); // don't forget to activate the shader before setting uniforms!  
