@@ -236,7 +236,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_RELEASE) {
 		wireframe = !wireframe;
-		wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);;
+		wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	if (key == GLFW_KEY_3 && action == GLFW_RELEASE)
 		lightFollow = !lightFollow;
@@ -377,7 +377,7 @@ void chooseObjects() {
 }
 ///_________________________________________________________________________________________________End of function
 
-///create the windows and options they will change
+///create the GUI windows and options they will change
 void renderGui(GLFWwindow *window) {
 
 	//Main ImGui Window
@@ -457,8 +457,9 @@ void renderGui(GLFWwindow *window) {
 	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 }
 ///_________________________________________________________________________________________________End of function
-///Rendwer quad from learnopenGL
-unsigned int quadVAO = 0;
+
+///Rendwer quad from learnopenGL, Short cut for rendering a overlay over the Glew Window
+unsigned int quadVAO = 0; // as above vao and vbo needed to render
 unsigned int quadVBO;
 void renderQuad()
 {
@@ -482,9 +483,11 @@ void renderQuad()
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
+	wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 ///_________________________________________________________________________________________________End of Function
 
@@ -581,7 +584,7 @@ int main() {
 	unsigned int shadowDepthMap;
 	glGenTextures(1, &shadowDepthMap);
 	glBindTexture(GL_TEXTURE_2D, shadowDepthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2048, 2048, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -674,10 +677,10 @@ int main() {
 		// --------------------------------------------------------------
 		glm::mat4 lightProjection, lightView;
 		glm::mat4 lightSpaceMatrix;
-		float near_plane = 0.0f, far_plane = 1000.0f;
+		float near_plane = 1.0f, far_plane = 1000.0f;
 		//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)windowWidth / (GLfloat)windowHeight, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		lightView = glm::lookAt(lightPosition, glm::vec3(170.0f, -30.0f, -175.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightProjection = glm::ortho(-100.0f, 300.0f, -220.0f, 420.0f, near_plane, far_plane);
+		lightView = glm::lookAt(lightPosition, glm::vec3(130.0f, -30.0f, -118.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		lightSpaceMatrix = lightProjection * lightView;
 		// render scene from light's point of view
 		shadowShaders.run();
