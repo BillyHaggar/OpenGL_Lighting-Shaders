@@ -45,6 +45,9 @@
     <ClCompile Include="Media\Imgui\imgui_impl_glfw_gl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -60,6 +63,12 @@
     <None Include="Media\Objects\Creeper-dae\Creeper.dae" />
     <None Include="Media\Objects\Pouf.dae" />
     <None Include="Media\Objects\Grid-obj\Grid.mtl" />
+    <None Include="Media\Shaders\screenFragment.fs" />
+    <None Include="Media\Shaders\screenVertex.vs" />
+    <None Include="Media\Shaders\blurVertex.vs" />
+    <None Include="Media\Shaders\blurFragment.fs" />
+    <None Include="Media\Shaders\shadowFragment.fs" />
+    <None Include="Media\Shaders\shadowVertex.vs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stb_image.h">
@@ -99,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Media\Imgui\stb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,6 +21,9 @@ class Shader
 {
 public:
 	unsigned int ID;
+	Shader() {
+		cout << "NO SHADER FILES ATTACHED TO SHADER" << endl;
+	}
 
 	// constructor reads and builds a fragemnt shader and a vertex shader and attaches them to the program it called from
 	Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
