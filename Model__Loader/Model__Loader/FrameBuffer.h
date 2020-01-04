@@ -30,4 +30,3 @@ extern "C" {
 #endif // __cplusplus
 
 #endif // FrameBuffer Header
-
