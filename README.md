@@ -7,8 +7,9 @@ Model Loader Plus is based on the original previous project of `MODEL LOADER`, a
 ## How to Run
 [![](http://img.youtube.com/vi/P8T7DuKGDec/0.jpg)](http://www.youtube.com/watch?v=P8T7DuKGDec "How to Run Software in VS 2017")
 
-- Run in release mode in VS 2017, with toolset v141 and windows SDK 10.0.17763.0
-- Must be run in release in order for Regex to run at an appropriate speed (very long delays otherwise)
+- Click on the video above to view a walkthrough of running this project.
+- Run in release mode in VS 2017, with toolset v141 and windows SDK 10.0.17763.0.
+- Must be run in release in order for Regex to run at an appropriate speed (very long delays otherwise).
 - When opening up the soloution the solution should just run as nuget packages are used for other header files and packages.
 - When upgradeing to VS 2019 as well as upgrading the SDK version problems can occur with running.
 
@@ -35,17 +36,10 @@ Model Loader Plus is based on the original previous project of `MODEL LOADER`, a
  
 ## On Program Run (What to do once program has started to be run)
 
-- The console will open and load 4 objects into memory
-- These objects will be the Creeper.obj, low_poly_boat.obj , pouf.obj and custom.obj
-- To load a custom obj replace the custom obj files loacted in the media folder within the model loader files.
-- Make sure to not rename the folder and replate the mtl and obj file with the custom files (make sure they are saved witht the same names)
-- When these 4 objects are loaded input is requested from the user
-- By typing 'Exit' the program will not load any extra objs
-- otherwise type either ''Creeper', 'Boat', 'Pouf', 'Custom' to load the relating obj model
-- PLEASE REMEMBER THESE ARE CASE SENSITIVE
-- Maximum number of objects that can be selected is 7, including the 4 that are automatically loaded.
-- After selection or by typing 'Exit' the Low_poly_boat.dae will load in.
+- The console will open and print out what is being done while the window is being prepared
+- Once everything is initialised a window will open and you will be greeted with a world consisting of a flat plane grid and 7 objects, 6 cubes and a boat object.
 - The `Model Loader` window will now run and the controls below will control the software.
+- Within the program, effects such as BLoom, Shadows and lighting will be demonstrated. By using the GUI windows effects can be turned on or off as well as tweaked to look how the user would like them. Controls below as well as the video explaining the program functionality further down below explains these gui windows further.
 
 
 ## CONTROLS
@@ -67,12 +61,43 @@ Model Loader Plus is based on the original previous project of `MODEL LOADER`, a
 - Swap textures on all objects <kbd>5</kbd>
 - To close the program press <kbd>esc</kbd>
 
-## Development Process
-#### Beginnings 
- When starting development heavy use of LearnOpenGL code was used, then at later stages such as the parser, independant c++ knowledge was used as well as research into each of the file types. Research was vital in order to complete this project as a strong understanding of C++ coding as well as how game objects rendered was necessary. Sprinkle in more OpenGL research and knowledge and this is how development could really start.
+#### IMGUI Windows
+All windows will require mouse control to be visible, press <kbd>1</kbd> in order to toggle the mouse on or off.
+##### MAIN WINDOW
+  - Here in the main window settings the ambient light level can be adjusted with the slider.
+  - To change the light colour either click on the light colour box to pick a new colour or use the R,G,B sliders to fine tune the RGB value of the light.
+  - Pressing the `Teleport light to me` button will do as said, it teleports the light to just above the camera position.
+  - By toggling `Show Camera Settings` the Camera Settings Window will open.
+  - By toggling `Show Feature Buttons` the Feature Buttons window will open.
+  - Framerate is displayed at the bottom of this window.
+  
+ ##### CAMERA SETTINGS wINDOW
+  - Here you can change camera settings such as camera speed and mouse sensitivity.
+  - By moving the sliders up or down you can increase their retrospective setting.
+ 
+ ##### Feature Buttons Window
+  - Here you can toggle bloom on or off, as well as access the toggle features mentioned above which are toggled with the keyboard keys.
+  - By pressing the buttons these act as if you were pressing the relating keyboard key.
+  - The Checkbox for bloom will toggle the bloom effect on or off
+  
+  To close any new window press the `close me` button. 
+  For a more in depth look into how these windows work view the video below on the use of this program.
+  
+  ## Using the Software (A Video Walkthrough)
+  [![](http://img.youtube.com/vi/P8T7DuKGDec/0.jpg)](http://www.youtube.com/watch?v=P8T7DuKGDec "Model Loader Plus")
 
-#### Main Development
-  In Main developmen,t after the main set up for rendering was achieved, more advanced features were implemented, these features were items such as lighting, DAE implemntation, multiple objects loaded as well as removing objects. 
+## How the Code Runs (What does what)
+#### Start of program flow
+Everything in the software starts from main, all includes at the top are related to packages and custom classes (header files) needed in order to run this software.
+ 
+ 
+## What Makes This Project
+#### What this project started with
 
-#### Later Features
- Some later features can be added, these are hit box detection, advanced lighting such as bloom as well as a better way for the console to load in objects. Overall however, with the knowledge known now a decent refractor of the code can occur, as well as deleteing unused code and clearing repeated code.
+#### Whats unique
+
+#### What works well
+Whats good about this project is the lighting as a whole, the shadows, bloom, blinn-phone lighting and how all this works together. With all these together you get a higher realism of lighting closer to AAA games and an understanding of how further development could get closer to a AAA game.
+
+
+
