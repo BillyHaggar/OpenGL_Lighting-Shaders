@@ -785,6 +785,24 @@ int main() {
 	glDeleteVertexArrays(1, &quadVAO);
 	glDeleteBuffers(1, &quadVBO);
 
+	glDeleteVertexArrays(1, &light_VAO);
+	glDeleteBuffers(1, &light_VBO);
+	glDeleteVertexArrays(1, &quadVAO);
+	glDeleteBuffers(1, &quadVBO);
+
+	glDeleteTextures(0, &shadowDepthMap);
+	glDeleteTextures(0, &textureColorbuffers[0]);
+	glDeleteTextures(0, &textureColorbuffers[1]);
+	glDeleteTextures(0, &pingpongBuffer[0]);
+	glDeleteTextures(0, &pingpongBuffer[1]);
+
+	glDeleteFramebuffers(0, &depthMapFBO);
+	glDeleteFramebuffers(0, &framebuffer);
+	glDeleteFramebuffers(0, &pingpongFBO[0]);
+	glDeleteFramebuffers(0, &pingpongFBO[1]);
+
+	glDeleteRenderbuffers(0, &rbo);
+
 	//clean up and close down correctly
 	ImGui_ImplGlfwGL3_Shutdown();
 	ImGui::DestroyContext();
