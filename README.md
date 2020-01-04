@@ -1,7 +1,7 @@
-## MODEL LOADER  
+## MODEL LOADER PLUS  
 
-This is all about the `MODEL LOADER`
-Model Loader is an application that will currently load .Obj and .dae files and render them in a space in the world. These objects currently have lighting, colour and textures applied to them. Please see below for futher details on running and controls.
+This is all about the `MODEL LOADER PLUS`
+Model Loader Plus is based on the original previous project of `MODEL LOADER`, all of which commits and previous work has been cloned over into this repository. As said the starting point of this project was to improve the original `MODEL LOADER` by implementing more advanced features such as Advanced Lighting, Bloom and Shadows as well as a GUI for editing aspects of the shaders. All of the mentioned is implemented within this project. See Below for a More under the hood look into how all of this works.
   
 
 ## How to Run
@@ -15,19 +15,25 @@ Model Loader is an application that will currently load .Obj and .dae files and 
 
 ## Current Functionality
 
- - .obj and dae files are loaded and renderered
- - Textures applied
+ - .obj and dae files can loaded and rendered
+ - Textures applied (UPDATED)
  - Colours added from files
- - Lighting applied using UVS/Normals
+ - Lighting applied using UVS/Normals (UPDATED)
  - Multiple objects in render space possible
  - Objects can be deleted from render space
  - Textures can be swapped
- - Appropriate memoroy management applied 
+ - Appropriate memoroy management applied (UPDATED)
  - Larger files can be rendered
- - objects can be selected
- - see below for more information
-
-## On Program Run
+ - Objects can be Chosed to be rendered
+ - wireframes can be viewed (UPDATED)
+ - light source is moveable (UPDATED)
+ - Blinn-Phong Lighting Implemented (NEW)
+ - GUI using ImGui implemented (NEW)
+ - Shadows are now implemented (NEW)
+ - Bloom is Implemented (NEW)
+ 
+ 
+## On Program Run (What to do once program has started to be run)
 
 - The console will open and load 4 objects into memory
 - These objects will be the Creeper.obj, low_poly_boat.obj , pouf.obj and custom.obj
