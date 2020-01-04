@@ -5,6 +5,7 @@ Model Loader is an application that will currently load .Obj and .dae files and 
   
 
 ## How to Run
+[![](http://img.youtube.com/vi/P8T7DuKGDec/0.jpg)](http://www.youtube.com/watch?v=P8T7DuKGDec "How to Run Software in VS 2017")
 
 - Run in release mode in VS 2017, with toolset v141 and windows SDK 10.0.17763.0
 - Must be run in release in order for Regex to run at an appropriate speed (very long delays otherwise)
