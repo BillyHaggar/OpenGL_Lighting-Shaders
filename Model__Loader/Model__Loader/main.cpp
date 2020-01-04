@@ -36,7 +36,7 @@ unsigned int light_VAO, light_VBO;
 ///object origin posistions
 glm::vec3 objectPositions[8] = {
   glm::vec3(0.0f,  -30.0f,  0.0f),
-  glm::vec3(100.0f,  25.0f, -70.0f),
+  glm::vec3(30.0f,  25.0f, -70.0f),
   glm::vec3(215.0f, 40.0f, -150.0f),
   glm::vec3(240.0f, 10.0f, -100.0f),
   glm::vec3(170.0f, 35.0f, -175.0f),
@@ -616,9 +616,11 @@ int main() {
 
 	//load default objects
 	loadObjects(grid.objectPath, grid.mtlPath, 20.0f);
-	for (int o = 0; o < 7; o++) {
+	loadObjects(boat.objectPath, boat.mtlPath, 0.3f);
+	for (int o = 0; o < 6; o++) {
 		loadObjects(creeper.objectPath, creeper.mtlPath, 25.0f);
 	}
+
 
 	//create the shaders needed using the shader header to create the vertex and the fragment shader
 	Shader objectShaders("Media\\Shaders\\mainVertex.vs", "Media\\Shaders\\mainFragment.fs");
