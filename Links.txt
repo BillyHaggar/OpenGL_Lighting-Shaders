@@ -1,0 +1,5 @@
+GitHub Repo: https://github.com/SOFT356/BHaggar_MMP
+Video Report: https://www.youtube.com/watch?v=ZjbctL4lVps
+
+Please be aware there are 2 videos, on the markdown readme, note the first is how to run the software in visual studio
+and the second is the video report.
