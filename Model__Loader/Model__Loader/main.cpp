@@ -20,7 +20,6 @@
 ///c++ libraries
 #include <iostream>
 #include <vector>
-
 ///as std:: is used alot this makes the reading of the code alittle easier to just include it, 
 //rather than including it every time it is needed
 using namespace std;
