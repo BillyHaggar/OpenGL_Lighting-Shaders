@@ -1,6 +1,7 @@
 ## MODEL LOADER PLUS  
 
 This is all about the `MODEL LOADER PLUS`
+   
 Model Loader Plus is based on the original previous project of `MODEL LOADER`, all of which commits’ and previous work has been cloned over into this repository. As said the starting point of this project was to improve the original `MODEL LOADER` by implementing more advanced features such as Advanced Lighting, Bloom and Shadows as well as a GUI for editing aspects of the shaders. All of the mentioned is implemented within this project. See Below for a More under the hood investigation how all of this works.
   
 
@@ -75,7 +76,7 @@ All windows will require mouse control to be visible, press <kbd>1</kbd> in orde
   - Here you can change camera settings such as camera speed and mouse sensitivity.
   - By moving the sliders up or down you can increase their retrospective setting.
  
- ##### Feature Buttons Window
+ ##### FEATURE BUTTONS WINDOW
   - Here you can toggle bloom on or off, as well as access the toggle features mentioned above which are toggled with the keyboard keys.
   - By pressing the buttons these act as if you were pressing the relating keyboard key.
   - The Checkbox for bloom will toggle the bloom effect on or off
@@ -85,15 +86,15 @@ All windows will require mouse control to be visible, press <kbd>1</kbd> in orde
   
   ## How the Code Runs (What does what)
   #### Start of program flow
-  Everything in the software starts from main, all includes at the top are related to packages and custom classes     (header files) needed in order to run this software. The Packages manually installed are ImGui and the others through NuGet are, GLM, NupenGL and GLFW. 
+  Everything in the software starts from main, all includes at the top are related to packages and custom classes (header files) needed in order to run this software. The Packages manually installed are ImGui and the others through NuGet are, GLM, NupenGL and GLFW. 
   
-  Classes along with their headers were created on a Object Oriented basis, so shaders, Meshes(objects), Loaders, Materials and Cameras all have their own constructors in order to be able to create a standard for each item. This way code can be contained as well as variables like VAO's, VBOS and such in the case of an object as each object requires its own set to render them. Much of this code was reused for the previous project. This also meant Main.Cpp didn’t end up too complex to understand as many of the classes code would be repeated many times or be a large section to implement into one file.
+  Classes along with their headers were created on a Object Oriented basis, so shaders, Meshes(objects), Loaders, Materials and Cameras all have their own constructors in order to be able to create a standard for each item. This way code can be contained as well as variables like VAO's, VBOS and such in the case of an object, as each object requires its own set of variablesto render. Much of this code was reused for the previous project. This also meant Main.Cpp didn’t end up too complex to understand as many of the classes code would be repeated many times or be a large section to implement into one file.
   
   On program run, once all variables needed are initialised, main is called and the set up of the window and GLFW and GLEW is initialised along with all object file paths that will be needed. Shaders and objects are created and loaded into memory ready to be used when rendering the scene. Then initial shader uniforms are set for the objects.
   
   Bloom and shadows are initialised by creating the necessary frame buffers, textures, depth maps and render buffer objects. These framebuffers and their textures are set to the correct shader uniforms ready to render the overlays and set the depth map needed for the shadows.
   
-  This is where the main render loop starts, think of this as each frame of the software. ImGUI window frame is created just before a check for input is made, these input checks work alongside call back functions for checking mouse and keyboard input. then the first render of objects is run using the shadow shaders, this is used to then calculate the depth map for the shadows. After a second pass of the render is run but this time using the shadow depth map in order to calculate where the shadows will be using the object shaders.
+  This is where the main render loop starts, think of this as each frame of the software. ImGUI window frame is created just before a check for input is made, these input checks work alongside call back functions for checking mouse and keyboard input. Then the first render of objects is run using the shadow shaders, this is used to then calculate the depth map for the shadows. After a second pass of the render is run but this time using the shadow depth map in order to calculate where the shadows will be using the object shaders.
   
   After the Post FX frame buffer is bound ready for the bloom, a depth map is used to calculate the bright areas and then this is blurred in a horizontal and vertical direction and rendered to the screen as an overlay. After Bloom is rendered to the scene is rebound via the framebuffer and rendered using the post fx screen shaders.
   
@@ -102,18 +103,18 @@ All windows will require mouse control to be visible, press <kbd>1</kbd> in orde
   On the closing of the software, the rendered loop is jumped out of and all buffers, arrays and other memory items are cleared out of memory for a correct and clean shutdown.
   
   #### Explanations to the main features
-  Shadows are created by first creating a depth map to work out what objects are in front of other objects from the perspective of the light source. By comparing the depth map of the scene from the cameras view and the light sources view, we can compare the depth value to see if there is a difference; if the difference of the fragments from the lights view is of a lower values than the cameras view then the cameras fragment must be in a shadow. From this Shadows can be calculated and rendered using its own frame buffer object.
+  Shadows are created by first creating a depth map to work out what objects are in front of other objects from the perspective of the light source. By comparing the depth map of the scene from the cameras view and the light sources view, we can compare the depth value to see if there is a difference; if the difference of the fragments from the lights view is of a lower value than the cameras view then the scenes fragment must be in a shadow. From this Shadows can be calculated and rendered using its own frame buffer object.
   
-  Bloom, in the simplest way is created by creating a colour buffer texture and extracting all fragments that exceed a certain brightness level and rendering them to this texture. This texture is blurred and combined with a colour buffer texture of the original scenes view to add in the bloom/glow effect
+  Bloom, in the simplest way is created by creating a colour buffer texture and extracting all fragments that exceed a certain brightness level and render them to this texture. This texture is blurred and combined with a colour buffer texture of the original scenes view to add in the bloom/glow effect
   
   ImGui/GUI works by using the package ImGui, each window is created and rendered to frame that is overlaid everything else in the scene. With each window relating static variables, these can be changed using a mixture of sliders, colour pickers, checkboxes etc. ImGui provides a way for a user to edit variables within the code without changing the code itself.
   
-  Lighting is implemented using the Blinn-phong lighting model, with this the angles between the camera and light source can be used to calculate the ambient light level, the diffuse and colour of the light and the specular highlights of the object. The specular highlights apply the ideas of the blinn-phong model in order to allow a reflection of greater the 90 degrees from the camera. All of these calculations are combined in order to achieve a somewhat realistic lighting model.
+  Lighting is implemented using the Blinn-phong lighting model, with this the angles between the camera and light source can be used to calculate the ambient light level, the diffuse and the specular highlights of the object. The specular highlights apply the ideas of the blinn-phong model in order to allow a reflection of greater the 90 degrees from the camera. All of these calculations are combined in order to achieve a somewhat realistic lighting model.
   
-  All code from the previous project remains within the project even if it is not used.
+  All code from the previous project remains within the project even if it is not used. Only main in main.cpp has removed code.
   
   ## Using the Software (A Video Walkthrough)
-  [![](http://img.youtube.com/vi/P8T7DuKGDec/0.jpg)](http://www.youtube.com/watch?v=P8T7DuKGDec "Model Loader Plus")
+  [![](http://img.youtube.com/vi/ZjbctL4lVps/0.jpg)](https://youtu.be/ZjbctL4lVps "Model Loader Plus")
    
    Click on the above image to play a video explaining how the project works as well as a brief rundown of what’s discussed below.
    
@@ -145,7 +146,7 @@ All windows will require mouse control to be visible, press <kbd>1</kbd> in orde
 #### What could be added/ improved
   Currently shadows look slightly off in the rendered scene, they don’t seem to be in a 100% accurate position, this means the overall effect is spoilt from such a small error. A possible cause for this could either be due to peter panning of the shadows or the fact the light source needs to be further away, this is because the angle used to calculate where the light is coming from isn’t coming from the light object itself but rather from the general direction of the light source. Shadows also seem a little too dark, especially on the sides of objects away from the light making them almost completely black, by editing shader values and by how much shadows decrease the frag colour this fix this issue.
   
-  As mentioned above bloom sometimes is seen as a bit too much, obstructing the scene by covering objects with light. Perhaps by messing around with the exposure and gamma of the shader calculations could correct this. Furthermore, when researching how to implement bloom, it was mentioned that HDR and bloom work very well together, from this maybe this could be an area to look into for a fix. Bloom also seems to implement major framerate issues; this is believed to be due to when the blur is rendered to the scene multiple times with the renderQuad function. Other frame rate issues are most likely due to the loops used in the main render loop.
+  As mentioned above bloom sometimes is seen as a bit too much, obstructing the scene by covering objects with light. Perhaps by messing around with the exposure and gamma of the shader, small changes could correct this. Furthermore, when researching how to implement bloom, it was mentioned that HDR and bloom work very well together, maybe this could be an area to look into for a fix. Bloom also seems to implement major framerate issues; this is believed to be due to when the blur is rendered to the scene multiple times with the renderQuad function. Other frame rate issues are most likely due to the loops used in the main render loop.
   
   The main of the program could also be tidied by creating further classes and headers to abstract some of the logic of the program, one main class that could be made is a framebuffer class to reduce the re-writing of code, however as understanding how all these new implementations work was only truly achieved once everything was developed it is only now that this could be achieved.
   
