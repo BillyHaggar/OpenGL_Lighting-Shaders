@@ -83,21 +83,45 @@ All windows will require mouse control to be visible, press <kbd>1</kbd> in orde
   To close any new window press the `close me` button. 
   For a more in depth look into how these windows work view the video below on the use of this program.
   
+  ## How the Code Runs (What does what)
+  #### Start of program flow
+  Everything in the software starts from main, all includes at the top are related to packages and custom classes     (header files) needed in order to run this software.
+  
   ## Using the Software (A Video Walkthrough)
   [![](http://img.youtube.com/vi/P8T7DuKGDec/0.jpg)](http://www.youtube.com/watch?v=P8T7DuKGDec "Model Loader Plus")
-
-## How the Code Runs (What does what)
-#### Start of program flow
-Everything in the software starts from main, all includes at the top are related to packages and custom classes (header files) needed in order to run this software.
- 
+   
+   Click on the above image to play a video explaining how the project works as well as a breif run down of whats discussed below.
+   
  
 ## What Makes This Project
-#### What this project started with
+#### What this project started with, as well as the start of development
+  In the start of this project the previous model loader was used, to see the code for this look back to the commit on 29th November 2019 called 'Merge branch 'master' of https://github.com/SOFT356/S356-bhaggar'. This was the last commit of a previous project that loaded .obj files and .dae files and rendered them with very basic shaders. By using this previous project, edits were made to use the creeper.obj objects as a cube to input into a base world purely to show off the aspects of this project. the texure of the creeper was changed as well as a new manually coded obj and mtl files for a grid floor ready to display shadows once they were implemented.
+   
+  The parts used from the previous project was the creation of an openGL window, the overal structure of the project as well as the main shaders used in order to render and display objects. The camera, camera controls and keyboard input was also used from the previous project. Some aspects were modified and up in the current functionality section you can see what was updated from the original code. 
+   
+  By using this previous section a quick start could be made so the real implementations could begin, these implementations were advanced lighting updates, Bloom, Shadows and a GUI.
 
 #### Whats unique
+  When comparing this project to other projects out there, such as the ones taught on LearnOpenGL.com, this project not only implements advanced features but also combines them together, such as using bloom and shadows. This wasnt exactly simple as with openGL understanding what needed to be created and binded to buffers in what order was important to get everything rendered to a scene. Furthermore combining seperate shaders into one shader meant that things like post processing effects could all be placed in one code file, although this could make the readibility of the code a little harder, it made the running of shaders in the render loop a little simpler.
+   
+   The use of the GUI also is unique to tutorial and projects online, as aspects of lighting can be changed by the user, and not by editing the code itself, this also made the debugging simpler as finding the right standard values could be found by editing values for the shaders with sliders in the GUI.
 
 #### What works well
-Whats good about this project is the lighting as a whole, the shadows, bloom, blinn-phone lighting and how all this works together. With all these together you get a higher realism of lighting closer to AAA games and an understanding of how further development could get closer to a AAA game.
+  Whats good about this project is the lighting as a whole, the shadows, bloom, blinn-phone lighting and how all this works together. With all these together you get a higher realism of lighting closer to AAA games and an understanding of how further development could get closer to a AAA game.
+ 
+ The shadows work well, mostly, as multiple shadows can be cast onto the grid and adds a strong aspect of lighting to the rendered scene. Although these could be considered a small addition by looking at them in the rendered scene and although the coding of these are very complex, it is worth it. By looking at the boat in the rendered scene the way that shadows cast on itself makes the lighting look much more realistic, rather than kust having a dark side and a light side.
+  
+  Bloom is very effictive at showing where the light is hitting objects the most, although with some light settings a bit too effective as it is almost a bit too bright. However, as for making the light emitters look like light emmitters this is great, the blur/glow also decreases depending on how bright the light source is which is a realistic as it gets, this also means that when it isnt a bright light being used the blur is almost invisible making it seem like the light is not on in a way.
+  
+  The overall lighting is fantastic when it is all working together, with the shadows and bloom working with the upgraded blinn-phong lighting, the scene looks near finished and complete when it comes to rendering objects. If these shaders were used to create a world for the game the graphics would look realistic enough to really create immersion for a player of a game.
+  
+  One last noting feature is the grid where all the objects hover above, this was made by manually coding a obj and mtl file, this was a very satisfying element as it really meant that I understood how obj and mtl files are constructed.
 
+#### What could be added/ improved
+  Currently shadows look slighty off in the rendered scene, they dont seem to be in a 100% accurate position, this means the overall effect is spoilt from such a small error. A possible cause for this could either be due to peter panning of the shadows or the fact the light source needs to be further away, this is because the angle used to calculate where the light is coming from isnt coming from the light object itself but rather from the general direction of the light source. Shadows also seem a little too dark, especially on the sides of objects away from the light making them almost completey black, by editing shader values and by how much shadows decrease the frag color this fix this issue.
+  
+  As mentioned above bloom sometimes is seen as a bit too much, obstructing the scene by covering objects with light. Perhaps by messing around with the exposure and gamma of the shader calulations coulld correct this. Furthermore when researching how to implement bloom, it was mentioned that HDR and bloom work very well together, from this maybe this could be an area to look into for a fix.
+  
+  As for additions, in addition to the above mentions downfalls, a area i would like to approach is the actual material of an object being implemeted for the objects. Also, normal mapping along with different textures would make the objects themselves look much better with a 3d effect as opposed to just flat faced edges.
 
 
