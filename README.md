@@ -1,6 +1,6 @@
 ## MODEL LOADER PLUS  
 
-This is all about the `MODEL LOADER PLUS`
+This is all about the `MODEL LOADER PLUS (Basic game engine using GLSL shaders)`
    
 Model Loader Plus is based on the original previous project of `MODEL LOADER`, all of which commits’ and previous work has been cloned over into this repository. As said the starting point of this project was to improve the original `MODEL LOADER` by implementing more advanced features such as Advanced Lighting, Bloom and Shadows as well as a GUI for editing aspects of the shaders. All of the mentioned is implemented within this project. See Below for a More under the hood investigation how all of this works.
   
